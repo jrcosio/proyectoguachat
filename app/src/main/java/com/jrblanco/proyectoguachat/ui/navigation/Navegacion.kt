@@ -1,4 +1,4 @@
-package com.jrblanco.proyectoguachat.ui.Navigation
+package com.jrblanco.proyectoguachat.ui.navigation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import com.jrblanco.proyectoguachat.modelo.RutasNav
 import com.jrblanco.proyectoguachat.ui.login.LoginView
 import com.jrblanco.proyectoguachat.ui.login.LoginViewModel
+import com.jrblanco.proyectoguachat.ui.principal.HomeView
 import com.jrblanco.proyectoguachat.ui.registro.RegistroView
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -17,5 +18,6 @@ fun Navegacion(navControl: NavHostController) {
     NavHost(navController = navControl, startDestination = RutasNav.Login.route) {
         composable(RutasNav.Login.route) { LoginView(navControl, LoginViewModel()) }
         composable(RutasNav.Registro.route) { RegistroView(navControl)}
+        composable(RutasNav.Home.route) { HomeView() }
     }
 }

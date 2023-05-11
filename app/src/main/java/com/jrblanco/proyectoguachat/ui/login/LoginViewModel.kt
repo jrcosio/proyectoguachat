@@ -24,6 +24,9 @@ class LoginViewModel : ViewModel() {
     private val _isLoginEnable = MutableLiveData<Boolean>()
     val isLoginEnable: LiveData<Boolean> = _isLoginEnable
 
+    private val _isErrorLogin = MutableLiveData<Boolean>()
+    val isErrorLogin: LiveData<Boolean> = _isErrorLogin
+
     /**
      * Función que se llama cuando se cambia el user o el password
      */
@@ -43,15 +46,13 @@ class LoginViewModel : ViewModel() {
             auth.signInWithEmailAndPassword(_user.value!!, _password.value!!)
                 .addOnCompleteListener {
                     if (it.isSuccessful) {
-                        Log.d("JR - Log", "LOGIN CORRECTO")
                         loginOk()
-                    } else {
-                        Log.d("JR - Log", "LOGIN INCORRECTO")
-                    }
+                        _isErrorLogin.value = false
+                    } else { _isErrorLogin.value = true }
                 }
-
         } catch (e: Exception) {
             Log.d("JR - Log", e.message!!)
+            _isErrorLogin.value = true
         }
     }
 

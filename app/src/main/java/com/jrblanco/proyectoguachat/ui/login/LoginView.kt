@@ -1,7 +1,7 @@
 package com.jrblanco.proyectoguachat.ui.login
 
-import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,24 +12,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,13 +40,16 @@ import com.jrblanco.proyectoguachat.modelo.RutasNav
 import com.jrblanco.proyectoguachat.ui.componentes.TextFieldEmail
 import com.jrblanco.proyectoguachat.ui.componentes.TextFieldPassword
 import com.jrblanco.proyectoguachat.ui.theme.Green50
+import com.jrblanco.proyectoguachat.ui.theme.Pink80
+import com.jrblanco.proyectoguachat.ui.theme.Red60
 
 @Composable
 fun LoginView(navControl: NavHostController, loginViewModel: LoginViewModel) {
 
-    val user:String by loginViewModel.user.observeAsState(initial = "")
-    val pass:String by loginViewModel.password.observeAsState(initial = "")
+    val user by loginViewModel.user.observeAsState(initial = "")
+    val pass by loginViewModel.password.observeAsState(initial = "")
     val isLoginEnable by loginViewModel.isLoginEnable.observeAsState(initial = false)
+    val isErrorLogin by loginViewModel.isErrorLogin.observeAsState(initial = false)
 
     val context = LocalContext.current
 
@@ -55,10 +59,16 @@ fun LoginView(navControl: NavHostController, loginViewModel: LoginViewModel) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             LogoApp()
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(if (!isErrorLogin) 50.dp else 20.dp))
 
-            TextFieldEmail(user, stringResource(R.string.usuario_login)) { loginViewModel.onLoginChange(user = it, pass = pass) }
-            TextFieldPassword(pass, stringResource(R.string.password_login)) { loginViewModel.onLoginChange(user = user, pass = it) }
+            LoginError(isErrorLogin)
+
+            TextFieldEmail(value = user, texto = stringResource(R.string.usuario_login) ) {
+                loginViewModel.onLoginChange(user = it, pass = pass)
+            }
+            TextFieldPassword( value = pass,  texto =stringResource(R.string.password_login) ) {
+                loginViewModel.onLoginChange(user = user, pass = it)
+            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -79,7 +89,11 @@ fun LoginView(navControl: NavHostController, loginViewModel: LoginViewModel) {
                 )
             }
             BotonInicioSesion(isLoginEnable) {
-                loginViewModel.login() { }
+                loginViewModel.login {
+                    navControl.navigate(RutasNav.Home.route, builder = {
+                        popUpTo(RutasNav.Login.route) { inclusive = true }      //Limpia la pila de navegación
+                    })
+                }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -107,10 +121,38 @@ fun LoginView(navControl: NavHostController, loginViewModel: LoginViewModel) {
 }
 
 /**
+ * Método que muestra en pantalla el mensaje de error de login o contraseña
+ */
+@Composable
+fun LoginError(isErrorLogin: Boolean) {
+    if (isErrorLogin) {
+        Box(modifier = Modifier
+            .clip(RoundedCornerShape(10.dp))
+            .background(Pink80)) {
+            Column(modifier = Modifier.padding(5.dp)) {
+                Row {
+                    Icon(imageVector = Icons.Rounded.Warning, contentDescription = "Error", tint = Red60)
+                    Text(
+                        text = "Usuario o contraseña incorrecto",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Red60
+                    )
+                }
+                Text(text = "Compruebe que ha introducido", modifier = Modifier.padding(horizontal =24.dp), color = Red60, fontSize = 16.sp)
+                Text(text = "correctamente el usuario y contraseña", modifier = Modifier.padding(horizontal =24.dp), color = Red60, fontSize = 16.sp)
+                Text(text = "e intente de nuevo.", modifier = Modifier.padding(horizontal =24.dp), color = Red60, fontSize = 16.sp)
+            }
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+    }
+}
+
+/**
  * Botón para iniciar sesión con usuario y contraseña
  */
 @Composable
-private fun BotonInicioSesion(isEnable:Boolean, onClickLogin: () -> Unit) {
+private fun BotonInicioSesion(isEnable: Boolean, onClickLogin: () -> Unit) {
     Button(
         onClick = onClickLogin,
         modifier = Modifier
@@ -134,7 +176,7 @@ private fun BotonInicioGoogle(onCLickGoogle: () -> Unit) {
             .fillMaxWidth()
             .height(60.dp)
             .padding(start = 90.dp, end = 90.dp),
-        ) {
+    ) {
         Image(
             painter = painterResource(id = R.drawable.google),
             contentDescription = stringResource(R.string.login_con_google),
@@ -153,7 +195,7 @@ private fun LogoApp() {
         contentDescription = "Google",
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp)
+            .height(90.dp)
     )
 }
 

@@ -31,6 +31,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -57,17 +58,24 @@ import com.jrblanco.proyectoguachat.ui.componentes.TextFieldSoloTexto
 import com.jrblanco.proyectoguachat.ui.theme.ProyectoGuaChatTheme
 import com.jrblanco.proyectoguachat.ui.theme.Purple40
 import com.jrblanco.proyectoguachat.ui.theme.Red50
+import com.jrblanco.proyectoguachat.ui.theme.Red60
 
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun RegistroView(navControl: NavHostController) {
+fun RegistroView(navControl: NavHostController, regViewModel: RegistroViewModel) {
+
+    //val imageUri by regViewModel.imageUri.observeAsState(initial = null)
+    val nombre by regViewModel.nombre.observeAsState(initial = "")
+    val apodo by regViewModel.apodo.observeAsState(initial = "")
+    val email by regViewModel.email.observeAsState(initial = "")
+    val pass by regViewModel.pass.observeAsState(initial = "")
 
     var imageUri  by remember { mutableStateOf<Uri?>(null) }
 
     //Para lanzar el activity que carga la galería de imagenes del dispositivo
-    val pickMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        imageUri = uri
+    val pickMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) {
+        imageUri = it
     }
 
     Box(
@@ -80,10 +88,10 @@ fun RegistroView(navControl: NavHostController) {
 
             AvatarUsuario(imageUri, pickMedia)
 
-            TextFieldSoloTexto(value = "", texto = "Nombre completo", onValueChange = {})
-            TextFieldSoloTexto(value = "", texto = "Apodo", onValueChange = {})
-            TextFieldEmail(value = "", texto = "Correo electrónico", onValueChange = {})
-            TextFieldPassword(value = "", texto = "Contraseña", onValueChange = {})
+            TextFieldSoloTexto(value = nombre, texto = "Nombre completo", onValueChange = {})
+            TextFieldSoloTexto(value = apodo, texto = "Apodo", onValueChange = {})
+            TextFieldEmail(value = email, texto = "Correo electrónico", onValueChange = {})
+            TextFieldPassword(value = pass, texto = "Contraseña", onValueChange = {})
             Spacer(modifier = Modifier.height(40.dp))
             BotonRegistrar()
         }
@@ -152,7 +160,7 @@ private fun AvatarUsuario(
                 .align(Alignment.BottomEnd)
                 .size(48.dp)
                 .clickable { pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
-            tint = Red50
+            tint = Red60
         )
     }
 }
