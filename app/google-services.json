@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "488953975550",
+    "project_id": "proyecto-guachat-dam",
+    "storage_bucket": "proyecto-guachat-dam.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:488953975550:android:c17c916d5425c0435d8baf",
+        "android_client_info": {
+          "package_name": "com.jrblanco.proyectoguachat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "488953975550-k432f2pi97o819u9nuq78q6iesn5i7dj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWQuw5KU3FXUHbw5S9M3zjqadPPR3YxqQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "488953975550-k432f2pi97o819u9nuq78q6iesn5i7dj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
