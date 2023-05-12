@@ -66,10 +66,11 @@ import com.jrblanco.proyectoguachat.ui.theme.Red60
 fun RegistroView(navControl: NavHostController, regViewModel: RegistroViewModel) {
 
     //val imageUri by regViewModel.imageUri.observeAsState(initial = null)
-    val nombre by regViewModel.nombre.observeAsState(initial = "")
-    val apodo by regViewModel.apodo.observeAsState(initial = "")
-    val email by regViewModel.email.observeAsState(initial = "")
-    val pass by regViewModel.pass.observeAsState(initial = "")
+//    val nombre by regViewModel.nombre.observeAsState(initial = "")
+//    val apodo by regViewModel.apodo.observeAsState(initial = "")
+//    val email by regViewModel.email.observeAsState(initial = "")
+//    val pass by regViewModel.pass.observeAsState(initial = "")
+    val usuario by regViewModel.usuario.observeAsState()
 
     var imageUri  by remember { mutableStateOf<Uri?>(null) }
 
@@ -88,10 +89,11 @@ fun RegistroView(navControl: NavHostController, regViewModel: RegistroViewModel)
 
             AvatarUsuario(imageUri, pickMedia)
 
-            TextFieldSoloTexto(value = nombre, texto = "Nombre completo", onValueChange = {})
-            TextFieldSoloTexto(value = apodo, texto = "Apodo", onValueChange = {})
-            TextFieldEmail(value = email, texto = "Correo electrónico", onValueChange = {})
-            TextFieldPassword(value = pass, texto = "Contraseña", onValueChange = {})
+            TextFieldSoloTexto(value = usuario!!.nombre, texto = "Nombre completo", onValueChange = {regViewModel.onChangeNombre(it)})
+           //TextFieldSoloTexto(value = apodo, texto = "Apodo", onValueChange = {regViewModel.onChangeApado(it)})
+            TextFieldEmail(value = usuario!!.email, texto = "Correo electrónico", onValueChange = {regViewModel.onChangeEmail(it)})
+            TextFieldPassword(value = usuario!!.pass, texto = "Contraseña", onValueChange = {regViewModel.onChangePass(it)})
+
             Spacer(modifier = Modifier.height(40.dp))
             BotonRegistrar()
         }

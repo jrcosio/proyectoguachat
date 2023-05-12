@@ -4,9 +4,14 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.jrblanco.proyectoguachat.modelo.UsuarioModel
 
 class RegistroViewModel : ViewModel() {
-    private val _nombre = MutableLiveData<String>()
+
+    private val _usuario = MutableLiveData<UsuarioModel>()
+    val usuario: LiveData<UsuarioModel> = _usuario
+
+    /*private val _nombre = MutableLiveData<String>()
     val nombre: LiveData<String> = _nombre
 
     private val _apodo = MutableLiveData<String>()
@@ -20,5 +25,14 @@ class RegistroViewModel : ViewModel() {
 
     private val _imageUri = MutableLiveData<Uri>()
     val imageUri: LiveData<Uri> = _imageUri
-
+*/
+    fun onChangeNombre(nomb:String){
+        _usuario.value!!.nombre = nomb
+    }
+    fun onChangeEmail(nomb:String){
+        _usuario.value!!.email = nomb
+    }
+    fun onChangePass(nomb:String){
+        _usuario.value!!.pass = nomb
+    }
 }
