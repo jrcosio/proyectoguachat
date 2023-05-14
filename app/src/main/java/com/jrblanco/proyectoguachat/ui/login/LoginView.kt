@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.google.firebase.auth.FirebaseAuth
 import com.jrblanco.proyectoguachat.R
 import com.jrblanco.proyectoguachat.modelo.RutasNav
 import com.jrblanco.proyectoguachat.ui.componentes.TextFieldEmail
@@ -52,6 +53,7 @@ fun LoginView(navControl: NavHostController, loginViewModel: LoginViewModel) {
     val isErrorLogin by loginViewModel.isErrorLogin.observeAsState(initial = false)
 
     val context = LocalContext.current
+
 
     Box(
         modifier = Modifier.fillMaxSize(),

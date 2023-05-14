@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class LoginViewModel : ViewModel() {
-    private val auth: FirebaseAuth = Firebase.auth
+    public val auth: FirebaseAuth = Firebase.auth
 
     private val _user = MutableLiveData<String>()
     val user: LiveData<String> = _user

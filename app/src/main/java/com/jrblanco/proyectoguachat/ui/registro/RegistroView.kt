@@ -3,6 +3,7 @@ package com.jrblanco.proyectoguachat.ui.registro
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -14,6 +15,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,10 +26,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,17 +48,17 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toFile
 import androidx.navigation.NavHostController
 import com.jrblanco.proyectoguachat.R
+import com.jrblanco.proyectoguachat.modelo.RutasNav
 import com.jrblanco.proyectoguachat.ui.componentes.TextFieldEmail
 import com.jrblanco.proyectoguachat.ui.componentes.TextFieldPassword
 import com.jrblanco.proyectoguachat.ui.componentes.TextFieldSoloTexto
-import com.jrblanco.proyectoguachat.ui.theme.ProyectoGuaChatTheme
+import com.jrblanco.proyectoguachat.ui.theme.Pink80
 import com.jrblanco.proyectoguachat.ui.theme.Purple40
-import com.jrblanco.proyectoguachat.ui.theme.Red50
 import com.jrblanco.proyectoguachat.ui.theme.Red60
 
 
@@ -65,18 +66,20 @@ import com.jrblanco.proyectoguachat.ui.theme.Red60
 @Composable
 fun RegistroView(navControl: NavHostController, regViewModel: RegistroViewModel) {
 
-    //val imageUri by regViewModel.imageUri.observeAsState(initial = null)
-//    val nombre by regViewModel.nombre.observeAsState(initial = "")
-//    val apodo by regViewModel.apodo.observeAsState(initial = "")
-//    val email by regViewModel.email.observeAsState(initial = "")
-//    val pass by regViewModel.pass.observeAsState(initial = "")
-    val usuario by regViewModel.usuario.observeAsState()
+    var errorRegistro by remember { mutableStateOf(0) }
 
-    var imageUri  by remember { mutableStateOf<Uri?>(null) }
+    val imageUri by regViewModel.imageUri.observeAsState(initial = null)
+    val nombre by regViewModel.nombre.observeAsState(initial = "")
+    val email by regViewModel.email.observeAsState(initial = "")
+    val pass by regViewModel.pass.observeAsState(initial = "")
+    val isRegistroEnable by regViewModel.isResgistroEnable.observeAsState(initial = false)
+
 
     //Para lanzar el activity que carga la galería de imagenes del dispositivo
     val pickMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) {
-        imageUri = it
+        if (it != null) {
+            regViewModel.onChangeImageUri(it)
+        }
     }
 
     Box(
@@ -88,14 +91,37 @@ fun RegistroView(navControl: NavHostController, regViewModel: RegistroViewModel)
             Spacer(modifier = Modifier.height(20.dp))
 
             AvatarUsuario(imageUri, pickMedia)
+            Spacer(modifier = Modifier.height(20.dp))
 
-            TextFieldSoloTexto(value = usuario!!.nombre, texto = "Nombre completo", onValueChange = {regViewModel.onChangeNombre(it)})
-           //TextFieldSoloTexto(value = apodo, texto = "Apodo", onValueChange = {regViewModel.onChangeApado(it)})
-            TextFieldEmail(value = usuario!!.email, texto = "Correo electrónico", onValueChange = {regViewModel.onChangeEmail(it)})
-            TextFieldPassword(value = usuario!!.pass, texto = "Contraseña", onValueChange = {regViewModel.onChangePass(it)})
+            TextFieldSoloTexto(
+                value = nombre,
+                texto = "Nombre completo",
+                onValueChange = { regViewModel.onChangeNombre(it) })
+            //TextFieldSoloTexto(value = apodo, texto = "Apodo", onValueChange = {regViewModel.onChangeApado(it)})
+            TextFieldEmail(
+                value = email,
+                texto = "Correo electrónico",
+                onValueChange = { regViewModel.onChangeEmail(it) })
+            TextFieldPassword(
+                value = pass,
+                texto = "Contraseña",
+                onValueChange = { regViewModel.onChangePass(it) })
 
-            Spacer(modifier = Modifier.height(40.dp))
-            BotonRegistrar()
+            Spacer(modifier = Modifier.height(30.dp))
+            BotonRegistrar(isRegistroEnable) {
+                regViewModel.crearUsuario {
+                    when (it) {
+                        0 -> {
+                            navControl.navigate(RutasNav.Home.route, builder = {
+                                popUpTo(RutasNav.Registro.route) { inclusive = true }      //Limpia la pila de navegación
+                            })
+                        }
+                        1,2,3 -> errorRegistro=it
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            RegistroError(errorRegistro)
         }
     }
 }
@@ -172,16 +198,65 @@ private fun AvatarUsuario(
  * Botón para registrar un usuario
  */
 @Composable
-private fun BotonRegistrar() {
+private fun BotonRegistrar(isEnable: Boolean, onClickAction: () -> Unit) {
 
     Button(
-        onClick = { },
+        onClick = onClickAction,
         modifier = Modifier
             .fillMaxWidth()
             .height(70.dp)
-            .padding(start = 90.dp, end = 90.dp)
+            .padding(start = 90.dp, end = 90.dp),
+        enabled = isEnable
     ) {
         Text(text = "Registrarme", fontSize = 22.sp)
+    }
+}
+
+@Composable
+fun RegistroError(tipoError:Int = 0) {
+    var textLineaCabezera = ""
+
+    when (tipoError) {
+        1 -> {textLineaCabezera = "Error el Usuario ya EXISTE"}
+        2 -> {textLineaCabezera = "Error en usuario o contraseña"}
+        3 -> {textLineaCabezera = "ERROR en el registro"}
+    }
+
+    if (tipoError != 0) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .background(Pink80)
+        ) {
+            Column(modifier = Modifier.padding(5.dp)) {
+                Row {
+                    Icon(
+                        imageVector = Icons.Rounded.Warning,
+                        contentDescription = "Error",
+                        tint = Red60
+                    )
+                    Text(
+                        text =  textLineaCabezera,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Red60
+                    )
+                }
+                Text(
+                    text = "Compruebe que el email es correcto",
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    color = Red60,
+                    fontSize = 16.sp
+                )
+                Text(
+                    text = "o la contraseña tiene 6 o mas caracteres",
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    color = Red60,
+                    fontSize = 16.sp
+                )
+                //Text(text = "e intente de nuevo.", modifier = Modifier.padding(horizontal =24.dp), color = Red60, fontSize = 16.sp)
+            }
+        }
     }
 }
 
