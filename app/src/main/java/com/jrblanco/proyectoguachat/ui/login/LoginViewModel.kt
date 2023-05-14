@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -59,8 +60,23 @@ class LoginViewModel : ViewModel() {
     /**
      * Método para iniciar sesión con cuenta de google (@gmail.com)
      */
-    fun loginConGoogle() {
-        Log.d("JR - Log", "Login con Google, de momento desactivado")
+    fun loginConGoogle(credential: AuthCredential, home: () -> Unit)
+    = viewModelScope.launch {
+        try {
+            auth.signInWithCredential(credential)
+                .addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        Log.d("JR - LOG","Login con google: CORRECTO")
+                        home()
+                    }
+                }
+                .addOnFailureListener {
+                    Log.d("JR - LOG","Fallo en el login con cuenta Google")
+                }
+        } catch (e:Exception) {
+            Log.d("JR - LOG",e.message!!)
+        }
+
     }
 
 }

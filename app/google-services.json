@@ -14,7 +14,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "488953975550-k432f2pi97o819u9nuq78q6iesn5i7dj.apps.googleusercontent.com",
+          "client_id": "488953975550-4p3p87i59d3icqk0k1tv8nsh5kn3m8q1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jrblanco.proyectoguachat",
+            "certificate_hash": "c2a9f55705ecda3ebfab78a2786183a1ca1865e3"
+          }
+        },
+        {
+          "client_id": "488953975550-9rhuf6vopf8fdaqbeqn5b86i8e9fn3rb.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -27,7 +35,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "488953975550-k432f2pi97o819u9nuq78q6iesn5i7dj.apps.googleusercontent.com",
+              "client_id": "488953975550-9rhuf6vopf8fdaqbeqn5b86i8e9fn3rb.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

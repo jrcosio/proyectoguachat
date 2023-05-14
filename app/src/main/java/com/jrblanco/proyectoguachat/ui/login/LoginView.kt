@@ -1,5 +1,8 @@
 package com.jrblanco.proyectoguachat.ui.login
 
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,7 +38,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.jrblanco.proyectoguachat.R
 import com.jrblanco.proyectoguachat.modelo.RutasNav
 import com.jrblanco.proyectoguachat.ui.componentes.TextFieldEmail
@@ -54,6 +61,23 @@ fun LoginView(navControl: NavHostController, loginViewModel: LoginViewModel) {
 
     val context = LocalContext.current
 
+    val googleLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) {
+        val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+            loginViewModel.loginConGoogle(credential) {
+                navControl.navigate(RutasNav.Home.route, builder = {
+                    popUpTo(RutasNav.Login.route) {
+                        inclusive = true
+                    }      //Limpia la pila de navegación
+                })
+
+            }
+        } catch (e: Exception){  Log.d("JR - LOG", "GoogleSignIn falló: ${e.message!!}") }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -65,10 +89,10 @@ fun LoginView(navControl: NavHostController, loginViewModel: LoginViewModel) {
 
             LoginError(isErrorLogin)
 
-            TextFieldEmail(value = user, texto = stringResource(R.string.usuario_login) ) {
+            TextFieldEmail(value = user, texto = stringResource(R.string.usuario_login)) {
                 loginViewModel.onLoginChange(user = it, pass = pass)
             }
-            TextFieldPassword( value = pass,  texto =stringResource(R.string.password_login) ) {
+            TextFieldPassword(value = pass, texto = stringResource(R.string.password_login)) {
                 loginViewModel.onLoginChange(user = user, pass = it)
             }
 
@@ -93,7 +117,9 @@ fun LoginView(navControl: NavHostController, loginViewModel: LoginViewModel) {
             BotonInicioSesion(isLoginEnable) {
                 loginViewModel.login {
                     navControl.navigate(RutasNav.Home.route, builder = {
-                        popUpTo(RutasNav.Login.route) { inclusive = true }      //Limpia la pila de navegación
+                        popUpTo(RutasNav.Login.route) {
+                            inclusive = true
+                        }      //Limpia la pila de navegación
                     })
                 }
             }
@@ -116,7 +142,16 @@ fun LoginView(navControl: NavHostController, loginViewModel: LoginViewModel) {
                 textAlign = TextAlign.Center,
             )
 
-            BotonInicioGoogle() { loginViewModel.loginConGoogle() }
+            BotonInicioGoogle() {
+                val token =  "488953975550-9rhuf6vopf8fdaqbeqn5b86i8e9fn3rb.apps.googleusercontent.com"
+
+                val opciones = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+                    .requestIdToken(token)
+                    .requestEmail()
+                    .build()
+                val googleSingInCliente = GoogleSignIn.getClient(context, opciones)
+                googleLauncher.launch(googleSingInCliente.signInIntent)
+            }
 
         }
     }
@@ -128,12 +163,18 @@ fun LoginView(navControl: NavHostController, loginViewModel: LoginViewModel) {
 @Composable
 fun LoginError(isErrorLogin: Boolean) {
     if (isErrorLogin) {
-        Box(modifier = Modifier
-            .clip(RoundedCornerShape(10.dp))
-            .background(Pink80)) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .background(Pink80)
+        ) {
             Column(modifier = Modifier.padding(5.dp)) {
                 Row {
-                    Icon(imageVector = Icons.Rounded.Warning, contentDescription = "Error", tint = Red60)
+                    Icon(
+                        imageVector = Icons.Rounded.Warning,
+                        contentDescription = "Error",
+                        tint = Red60
+                    )
                     Text(
                         text = "Usuario o contraseña incorrecto",
                         fontSize = 18.sp,
@@ -141,9 +182,24 @@ fun LoginError(isErrorLogin: Boolean) {
                         color = Red60
                     )
                 }
-                Text(text = "Compruebe que ha introducido", modifier = Modifier.padding(horizontal =24.dp), color = Red60, fontSize = 16.sp)
-                Text(text = "correctamente el usuario y contraseña", modifier = Modifier.padding(horizontal =24.dp), color = Red60, fontSize = 16.sp)
-                Text(text = "e intente de nuevo.", modifier = Modifier.padding(horizontal =24.dp), color = Red60, fontSize = 16.sp)
+                Text(
+                    text = "Compruebe que ha introducido",
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    color = Red60,
+                    fontSize = 16.sp
+                )
+                Text(
+                    text = "correctamente el usuario y contraseña",
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    color = Red60,
+                    fontSize = 16.sp
+                )
+                Text(
+                    text = "e intente de nuevo.",
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    color = Red60,
+                    fontSize = 16.sp
+                )
             }
         }
         Spacer(modifier = Modifier.height(10.dp))
