@@ -145,7 +145,7 @@ fun LoginView(navControl: NavHostController, loginViewModel: LoginViewModel) {
             BotonInicioGoogle() {
                 val token =  "488953975550-9rhuf6vopf8fdaqbeqn5b86i8e9fn3rb.apps.googleusercontent.com"
 
-                val opciones = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+                val opciones = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                     .requestIdToken(token)
                     .requestEmail()
                     .build()
