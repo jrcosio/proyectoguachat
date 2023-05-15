@@ -67,6 +67,7 @@ class LoginViewModel : ViewModel() {
                 .addOnCompleteListener {
                     if (it.isSuccessful) {
                         Log.d("JR - LOG","Login con google: CORRECTO")
+                        //Guardar datos en la base de datos
                         home()
                     }
                 }

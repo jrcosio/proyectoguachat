@@ -18,12 +18,12 @@ import com.jrblanco.proyectoguachat.ui.registro.RegistroViewModel
 @Composable
 fun Navegacion(navControl: NavHostController) {
 
+    //Esto se quita cuando este todo operativo
     FirebaseAuth.getInstance().signOut()
 
     //Comprobamos si el dispositivo tiene iniciada la sesión de ser así
     //cambiamos la ruta de inicio y se salta el Login
     val usuario = FirebaseAuth.getInstance().currentUser
-
     val ruta = if (usuario != null) RutasNav.Home.route else RutasNav.Login.route
 
     NavHost(navController = navControl, startDestination = ruta) {

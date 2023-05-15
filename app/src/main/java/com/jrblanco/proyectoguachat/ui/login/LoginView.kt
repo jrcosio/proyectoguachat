@@ -60,7 +60,12 @@ fun LoginView(navControl: NavHostController, loginViewModel: LoginViewModel) {
     val isErrorLogin by loginViewModel.isErrorLogin.observeAsState(initial = false)
 
     val context = LocalContext.current
+    val token = stringResource(id = R.string.default_web_client_id)
 
+
+    /**
+     * Forma o "Método" para lanzar los activitys que retornan una respuesta
+     */
     val googleLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) {
@@ -83,6 +88,7 @@ fun LoginView(navControl: NavHostController, loginViewModel: LoginViewModel) {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
+
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             LogoApp()
             Spacer(modifier = Modifier.height(if (!isErrorLogin) 50.dp else 20.dp))
@@ -142,15 +148,15 @@ fun LoginView(navControl: NavHostController, loginViewModel: LoginViewModel) {
                 textAlign = TextAlign.Center,
             )
 
-            BotonInicioGoogle() {
-                val token =  "488953975550-9rhuf6vopf8fdaqbeqn5b86i8e9fn3rb.apps.googleusercontent.com"
 
+            BotonInicioGoogle() {
                 val opciones = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                     .requestIdToken(token)
                     .requestEmail()
                     .build()
                 val googleSingInCliente = GoogleSignIn.getClient(context, opciones)
-                googleLauncher.launch(googleSingInCliente.signInIntent)
+
+                googleLauncher.launch(googleSingInCliente.signInIntent) //Lanza el activity de autentificación con cuenta de Google
             }
 
         }
