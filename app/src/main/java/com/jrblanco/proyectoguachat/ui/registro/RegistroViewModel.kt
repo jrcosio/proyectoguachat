@@ -29,6 +29,9 @@ class RegistroViewModel : ViewModel() {
     private val _pass = MutableLiveData<String>("")
     val pass: LiveData<String> = _pass
 
+    private val _vpass = MutableLiveData<String>("")
+    val vpass: LiveData<String> = _vpass
+
     private val _imageUri = MutableLiveData<Uri>(null)
     val imageUri: LiveData<Uri> = _imageUri
 
@@ -43,12 +46,16 @@ class RegistroViewModel : ViewModel() {
 
     fun onChangeEmail(email: String) {
         _email.value = email
-        _isResgistroEnable.value = _email.value!!.isNotEmpty() && _pass.value!!.isNotEmpty()
+        _isResgistroEnable.value = Patterns.EMAIL_ADDRESS.matcher(_email.value).matches() && _pass.value.equals(_vpass.value) && !_pass.value.isNullOrEmpty() && !_vpass.value.isNullOrEmpty()
+        //  _isResgistroEnable.value = _email.value!!.isNotEmpty() && _pass.value!!.isNotEmpty()
     }
 
-    fun onChangePass(pass: String) {
+    fun onChangePass(pass: String, vpass: String) {
         _pass.value = pass
-        _isResgistroEnable.value = _email.value!!.isNotEmpty() && _pass.value!!.isNotEmpty()
+        _vpass.value = vpass
+        _isResgistroEnable.value = Patterns.EMAIL_ADDRESS.matcher(_email.value).matches() && _pass.value.equals(_vpass.value) && !_pass.value.isNullOrEmpty() && !_vpass.value.isNullOrEmpty()
+
+        //_isResgistroEnable.value = _email.value!!.isNotEmpty() && _pass.value!!.isNotEmpty()
     }
 
     fun onChangeImageUri(uri: Uri) {

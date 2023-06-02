@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class LoginViewModel : ViewModel() {
-    public val auth: FirebaseAuth = Firebase.auth
+    val auth: FirebaseAuth = Firebase.auth
 
     private val _user = MutableLiveData<String>()
     val user: LiveData<String> = _user
@@ -35,7 +35,7 @@ class LoginViewModel : ViewModel() {
         _user.value = user
         _password.value = pass
         _isLoginEnable.value =
-            user.isNotEmpty() && pass.isNotEmpty()       //Activa el botón de Iniciar sesión si no están vacios
+            user.isNotEmpty() && pass.isNotEmpty()                                      //Activa el botón de Iniciar sesión si no están vacios
     }
 
     /**

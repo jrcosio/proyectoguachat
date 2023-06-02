@@ -1,6 +1,5 @@
 package com.jrblanco.proyectoguachat
 
-import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -16,11 +15,9 @@ import com.jrblanco.proyectoguachat.ui.theme.ProyectoGuaChatTheme
 
 
 class MainActivity : ComponentActivity() {
-
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
            ProyectoGuaChatTheme {
                Surface(
@@ -36,4 +33,4 @@ class MainActivity : ComponentActivity() {
 }
 
 
-//@Preview(showBackground = true, showSystemUi = true)
+

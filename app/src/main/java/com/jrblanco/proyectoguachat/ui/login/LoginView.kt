@@ -81,7 +81,9 @@ fun LoginView(navControl: NavHostController, loginViewModel: LoginViewModel) {
                 })
 
             }
-        } catch (e: Exception){  Log.d("JR - LOG", "GoogleSignIn falló: ${e.message!!}") }
+        } catch (e: Exception) {
+            Log.d("JR - LOG", "GoogleSignIn falló: ${e.message!!}")
+        }
     }
 
     Box(
@@ -178,33 +180,27 @@ fun LoginError(isErrorLogin: Boolean) {
                 Row {
                     Icon(
                         imageVector = Icons.Rounded.Warning,
-                        contentDescription = "Error",
-                        tint = Red60
+                        contentDescription = "Error", tint = Red60
                     )
                     Text(
                         text = "Usuario o contraseña incorrecto",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Red60
+                        fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Red60
                     )
                 }
                 Text(
                     text = "Compruebe que ha introducido",
                     modifier = Modifier.padding(horizontal = 24.dp),
-                    color = Red60,
-                    fontSize = 16.sp
+                    color = Red60, fontSize = 16.sp
                 )
                 Text(
                     text = "correctamente el usuario y contraseña",
                     modifier = Modifier.padding(horizontal = 24.dp),
-                    color = Red60,
-                    fontSize = 16.sp
+                    color = Red60, fontSize = 16.sp
                 )
                 Text(
                     text = "e intente de nuevo.",
                     modifier = Modifier.padding(horizontal = 24.dp),
-                    color = Red60,
-                    fontSize = 16.sp
+                    color = Red60, fontSize = 16.sp
                 )
             }
         }

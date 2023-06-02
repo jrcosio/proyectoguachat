@@ -71,7 +71,8 @@ fun RegistroView(navControl: NavHostController, regViewModel: RegistroViewModel)
     val imageUri by regViewModel.imageUri.observeAsState(initial = null)
     val nombre by regViewModel.nombre.observeAsState(initial = "")
     val email by regViewModel.email.observeAsState(initial = "")
-    val pass by regViewModel.pass.observeAsState(initial = "")
+    val password by regViewModel.pass.observeAsState(initial = "")
+    val vpassword by regViewModel.vpass.observeAsState(initial = "")
     val isRegistroEnable by regViewModel.isResgistroEnable.observeAsState(initial = false)
 
 
@@ -103,15 +104,19 @@ fun RegistroView(navControl: NavHostController, regViewModel: RegistroViewModel)
                 texto = "Correo electrónico",
                 onValueChange = { regViewModel.onChangeEmail(it) })
             TextFieldPassword(
-                value = pass,
+                value = password,
                 texto = "Contraseña",
-                onValueChange = { regViewModel.onChangePass(it) })
+                onValueChange = {regViewModel.onChangePass(it,vpassword) })
+            TextFieldPassword(
+                value = vpassword,
+                texto = "Verifica Contraseña",
+                onValueChange = { regViewModel.onChangePass(password,it) })
 
             Spacer(modifier = Modifier.height(30.dp))
             BotonRegistrar(isRegistroEnable) {
                 regViewModel.crearUsuario {
                     when (it) {
-                        0 -> {
+                        0 -> {""
                             navControl.navigate(RutasNav.Home.route, builder = {
                                 popUpTo(RutasNav.Registro.route) { inclusive = true }      //Limpia la pila de navegación
                             })

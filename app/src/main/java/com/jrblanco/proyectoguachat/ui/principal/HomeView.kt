@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.firebase.auth.FirebaseAuth
+import com.jrblanco.proyectoguachat.ui.principal.componenteshome.BottonBar
 import com.jrblanco.proyectoguachat.ui.theme.Green40
 import com.jrblanco.proyectoguachat.ui.theme.Purple40
 
@@ -39,7 +39,9 @@ fun HomeView() {
     var texto by remember { mutableStateOf("") }
 
     Scaffold(
-        topBar = { TopBar { isBuscar = !isBuscar } }
+        topBar = { TopBar { isBuscar = !isBuscar } },
+        bottomBar = { BottonBar(Modifier)}
+
     ) {
         Column(
             modifier = Modifier

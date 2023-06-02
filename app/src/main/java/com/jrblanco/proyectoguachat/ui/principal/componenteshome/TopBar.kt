@@ -31,7 +31,7 @@ fun TopBar(isBuscar: () -> Unit) {
                 Image(
                     painter = painterResource(id = R.drawable.guachat),
                     modifier = Modifier.height(50.dp),
-                    contentDescription = ""
+                    contentDescription = "Logotipo de GuaChat"
                 )
             }
         },
