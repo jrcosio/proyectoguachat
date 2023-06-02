@@ -1,7 +1,7 @@
 # Proyecto Guachat
 
 <div align="center">
-  <img src="img/logo.png" alt="Logo del Proyecto Guachat" width="200" height="200">
+  <img src="img/logo.png" alt="Logo del Proyecto Guachat" width="300" height="102">
 </div>
 
 Bienvenido al repositorio del Proyecto Guachat, una aplicación de mensajería móvil desarrollada como proyecto de fin de grado de DAM (Desarrollo de Aplicaciones Multiplataforma). Esta aplicación ha sido creada utilizando Kotlin Jetpack Compose y Firebase para gestionar la autenticación de usuarios, almacenamiento de datos y base de datos NoSQL.
@@ -9,13 +9,13 @@ Bienvenido al repositorio del Proyecto Guachat, una aplicación de mensajería m
 ## Capturas de pantalla
 
 <div align="center">
-  <img src="img/captura1.png" alt="Captura 1" width="400">
-  <img src="img/captura2.png" alt="Captura 2" width="400">
+  <img src="img/imagen1.png" alt="Captura 1" width="400">
+  <img src="img/imagen2.png" alt="Captura 2" width="400">
 </div>
 
 <div align="center">
-  <img src="img/captura3.png" alt="Captura 3" width="400">
-  <img src="img/captura4.png" alt="Captura 4" width="400">
+  <img src="img/imagen3.png" alt="Captura 3" width="400">
+  <img src="img/imagen4.png" alt="Captura 4" width="400">
 </div>
 
 ## Características principales
