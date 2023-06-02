@@ -9,13 +9,13 @@ Bienvenido al repositorio del Proyecto Guachat, una aplicación de mensajería m
 ## Capturas de pantalla
 
 <div align="center">
-  <img src="img/imagen1.png" alt="Captura 1" width="400">
-  <img src="img/imagen2.png" alt="Captura 2" width="400">
+  <img src="img/imagen1.png" alt="Captura 1" width="250">
+  <img src="img/imagen2.png" alt="Captura 2" width="250">
 </div>
 
 <div align="center">
-  <img src="img/imagen3.png" alt="Captura 3" width="400">
-  <img src="img/imagen4.png" alt="Captura 4" width="400">
+  <img src="img/imagen3.png" alt="Captura 3" width="250">
+  <img src="img/imagen4.png" alt="Captura 4" width="250">
 </div>
 
 ## Características principales
