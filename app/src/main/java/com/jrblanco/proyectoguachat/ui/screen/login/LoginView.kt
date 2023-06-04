@@ -1,4 +1,4 @@
-package com.jrblanco.proyectoguachat.ui.login
+package com.jrblanco.proyectoguachat.ui.screen.login
 
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -41,12 +41,11 @@ import androidx.navigation.NavHostController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.jrblanco.proyectoguachat.R
 import com.jrblanco.proyectoguachat.modelo.RutasNav
-import com.jrblanco.proyectoguachat.ui.componentes.TextFieldEmail
-import com.jrblanco.proyectoguachat.ui.componentes.TextFieldPassword
+import com.jrblanco.proyectoguachat.ui.screen.componentes.TextFieldEmail
+import com.jrblanco.proyectoguachat.ui.screen.componentes.TextFieldPassword
 import com.jrblanco.proyectoguachat.ui.theme.Green50
 import com.jrblanco.proyectoguachat.ui.theme.Pink80
 import com.jrblanco.proyectoguachat.ui.theme.Red60
@@ -60,8 +59,13 @@ fun LoginView(navControl: NavHostController, loginViewModel: LoginViewModel) {
     val isErrorLogin by loginViewModel.isErrorLogin.observeAsState(initial = false)
 
     val context = LocalContext.current
-    val token = stringResource(id = R.string.default_web_client_id)
 
+    val opciones = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestIdToken(stringResource(id = R.string.default_web_client_id))
+        .requestEmail()
+        .build()
+
+    val googleSingInCliente = GoogleSignIn.getClient(context, opciones)
 
     /**
      * Forma o "Método" para lanzar los activitys que retornan una respuesta
@@ -71,9 +75,10 @@ fun LoginView(navControl: NavHostController, loginViewModel: LoginViewModel) {
     ) {
         val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
         try {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
             val account = task.getResult(ApiException::class.java)
-            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-            loginViewModel.loginConGoogle(credential) {
+
+            loginViewModel.loginConGoogle(account) {
                 navControl.navigate(RutasNav.Home.route, builder = {
                     popUpTo(RutasNav.Login.route) {
                         inclusive = true
@@ -152,12 +157,6 @@ fun LoginView(navControl: NavHostController, loginViewModel: LoginViewModel) {
 
 
             BotonInicioGoogle() {
-                val opciones = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestIdToken(token)
-                    .requestEmail()
-                    .build()
-                val googleSingInCliente = GoogleSignIn.getClient(context, opciones)
-
                 googleLauncher.launch(googleSingInCliente.signInIntent) //Lanza el activity de autentificación con cuenta de Google
             }
 

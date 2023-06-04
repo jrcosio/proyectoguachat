@@ -1,4 +1,4 @@
-package com.jrblanco.proyectoguachat.ui.principal.componenteshome
+package com.jrblanco.proyectoguachat.ui.screen.principal.componenteshome
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues

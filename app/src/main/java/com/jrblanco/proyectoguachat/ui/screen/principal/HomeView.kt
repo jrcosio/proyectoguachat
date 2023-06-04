@@ -1,4 +1,4 @@
-package com.jrblanco.proyectoguachat.ui.principal
+package com.jrblanco.proyectoguachat.ui.screen.principal
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -26,7 +26,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jrblanco.proyectoguachat.ui.principal.componenteshome.BottonBar
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthCredential
+import com.jrblanco.proyectoguachat.ui.principal.TopBar
+import com.jrblanco.proyectoguachat.ui.screen.principal.componenteshome.BottonBar
 import com.jrblanco.proyectoguachat.ui.theme.Green40
 import com.jrblanco.proyectoguachat.ui.theme.Purple40
 
@@ -35,12 +38,16 @@ import com.jrblanco.proyectoguachat.ui.theme.Purple40
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun HomeView() {
+
+
+
+
     var isBuscar by remember { mutableStateOf(false) }
     var texto by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = { TopBar { isBuscar = !isBuscar } },
-        bottomBar = { BottonBar(Modifier)}
+        bottomBar = { BottonBar(Modifier) }
 
     ) {
         Column(

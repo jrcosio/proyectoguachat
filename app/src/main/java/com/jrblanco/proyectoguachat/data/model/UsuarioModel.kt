@@ -1,4 +1,4 @@
-package com.jrblanco.proyectoguachat.modelo
+package com.jrblanco.proyectoguachat.data.model
 
 data class UsuarioModel(
     var idGoogle: String = "",

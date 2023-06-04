@@ -1,4 +1,4 @@
-package com.jrblanco.proyectoguachat.ui.componentes
+package com.jrblanco.proyectoguachat.ui.screen.componentes
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -97,6 +97,7 @@ fun TextFieldEmail(value: String, texto: String, onValueChange: (String) -> Unit
             .fillMaxWidth(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
         label = { Text(text = texto) },
+        placeholder = {Text(text = texto)},
         singleLine = true
     )
 }

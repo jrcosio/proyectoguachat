@@ -1,9 +1,8 @@
-package com.jrblanco.proyectoguachat.ui.registro
+package com.jrblanco.proyectoguachat.ui.screen.registro
 
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -50,13 +49,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.net.toFile
 import androidx.navigation.NavHostController
 import com.jrblanco.proyectoguachat.R
 import com.jrblanco.proyectoguachat.modelo.RutasNav
-import com.jrblanco.proyectoguachat.ui.componentes.TextFieldEmail
-import com.jrblanco.proyectoguachat.ui.componentes.TextFieldPassword
-import com.jrblanco.proyectoguachat.ui.componentes.TextFieldSoloTexto
+import com.jrblanco.proyectoguachat.ui.screen.componentes.TextFieldEmail
+import com.jrblanco.proyectoguachat.ui.screen.componentes.TextFieldPassword
+import com.jrblanco.proyectoguachat.ui.screen.componentes.TextFieldSoloTexto
 import com.jrblanco.proyectoguachat.ui.theme.Pink80
 import com.jrblanco.proyectoguachat.ui.theme.Purple40
 import com.jrblanco.proyectoguachat.ui.theme.Red60
