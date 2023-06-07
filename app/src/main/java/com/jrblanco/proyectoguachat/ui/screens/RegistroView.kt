@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.jrblanco.proyectoguachat.R
 import com.jrblanco.proyectoguachat.modelo.RutasNav
-import com.jrblanco.proyectoguachat.registro.application.viewmodel.RegistroViewModel
+import com.jrblanco.proyectoguachat.aplication.viewmodels.RegistroViewModel
 import com.jrblanco.proyectoguachat.ui.screen.componentes.TextFieldEmail
 import com.jrblanco.proyectoguachat.ui.screen.componentes.TextFieldPassword
 import com.jrblanco.proyectoguachat.ui.screen.componentes.TextFieldSoloTexto

@@ -14,10 +14,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.jrblanco.proyectoguachat.R
 import com.jrblanco.proyectoguachat.modelo.RutasNav
 import com.jrblanco.proyectoguachat.ui.screen.login.LoginView
-import com.jrblanco.proyectoguachat.login.application.viewmodel.LoginViewModel
+import com.jrblanco.proyectoguachat.aplication.viewmodels.LoginViewModel
 import com.jrblanco.proyectoguachat.ui.screen.principal.HomeView
 import com.jrblanco.proyectoguachat.ui.screen.registro.RegistroView
-import com.jrblanco.proyectoguachat.registro.application.viewmodel.RegistroViewModel
+import com.jrblanco.proyectoguachat.aplication.viewmodels.RegistroViewModel
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable

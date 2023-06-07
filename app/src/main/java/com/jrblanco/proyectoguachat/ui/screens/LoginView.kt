@@ -42,7 +42,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.jrblanco.proyectoguachat.R
-import com.jrblanco.proyectoguachat.login.application.viewmodel.LoginViewModel
+import com.jrblanco.proyectoguachat.aplication.viewmodels.LoginViewModel
 import com.jrblanco.proyectoguachat.modelo.RutasNav
 import com.jrblanco.proyectoguachat.ui.screen.componentes.TextFieldEmail
 import com.jrblanco.proyectoguachat.ui.screen.componentes.TextFieldPassword

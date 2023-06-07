@@ -1,4 +1,4 @@
-package com.jrblanco.proyectoguachat.login.application.viewmodel
+package com.jrblanco.proyectoguachat.aplication.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -6,15 +6,22 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.jrblanco.proyectoguachat.aplication.usecase.GuardarUserDBUseCase
+import com.jrblanco.proyectoguachat.aplication.usecase.LoginUseCase
+import com.jrblanco.proyectoguachat.aplication.usecase.RegistroUseCase
 import com.jrblanco.proyectoguachat.infraestructure.FirebaseAuthRepository
 import com.jrblanco.proyectoguachat.infraestructure.FirestoreDatabaseRepository
-import com.jrblanco.proyectoguachat.login.domain.model.Usuario
+import com.jrblanco.proyectoguachat.domain.model.Usuario
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
 
-    private val loginRepository = FirebaseAuthRepository();
+    private val loginFirebaseRepository = FirebaseAuthRepository();
     private val dataBaseRepository = FirestoreDatabaseRepository()
+
+    //---- Instaciamos los casos de uso
+    private val loginUseCase = LoginUseCase(loginFirebaseRepository)    //Inyecto el repository
+    private val guardarUserUseCase = GuardarUserDBUseCase(dataBaseRepository)
 
     private val _user = MutableLiveData<String>()
     val user: LiveData<String> = _user
@@ -35,7 +42,7 @@ class LoginViewModel : ViewModel() {
         _user.value = user
         _password.value = pass
         _isLoginEnable.value =
-            user.isNotEmpty() && pass.isNotEmpty()                                      //Activa el botón de Iniciar sesión si no están vacios
+            user.isNotEmpty() && pass.isNotEmpty()     //Activa el botón de Iniciar sesión si no están vacios
     }
 
     /**
@@ -45,7 +52,7 @@ class LoginViewModel : ViewModel() {
 
     fun login(loginOk: () -> Unit) = viewModelScope.launch {
         try {
-            val isSuccessful = loginRepository.loginClassic(_user.value!!, _password.value!!)
+            val isSuccessful = loginUseCase.login(_user.value!!, _password.value!!)
             if (isSuccessful) {
                 loginOk()
                 _isErrorLogin.value = false
@@ -66,16 +73,16 @@ class LoginViewModel : ViewModel() {
 
             val idToken = account?.idToken
 
-            val isSuccessful = idToken?.let { loginRepository.loginGoogle(it) }
+            val isSuccessful = idToken?.let { loginUseCase.loginGoogle(it) }
             if (isSuccessful == true) {
                 Log.d("JR - LOG", "Login con google: CORRECTO")
                 //Guardar datos en la base de datos
                 //  val usuario = UsuarioModel(nombre = _nombre.value!!,email = _email.value!!)
-                val auth = loginRepository.auth
+                val auth = loginUseCase.auth
                 val usuario = Usuario(nombre = auth.currentUser?.displayName.toString(),email = auth.currentUser?.email.toString())
-                dataBaseRepository.saveUser(usuario,
+                guardarUserUseCase.saveUser(usuario,
                         onSuccess = {Log.d("JR_LOG", "Usuario guardado con éxito")},
-                        onFailure = {Log.d("JR_LOG", "Error al guardar el usuario. ${it.message}")})
+                        onFailure = { Log.d("JR_LOG", "Error al guardar el usuario. ${it.message}") })
 
                 home()
             }

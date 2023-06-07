@@ -1,4 +1,4 @@
-package com.jrblanco.proyectoguachat.registro.application.viewmodel
+package com.jrblanco.proyectoguachat.aplication.viewmodels
 
 import android.net.Uri
 import android.util.Log
@@ -11,19 +11,25 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.jrblanco.proyectoguachat.aplication.usecase.GuardarImagenUsecase
+import com.jrblanco.proyectoguachat.aplication.usecase.GuardarUserDBUseCase
+import com.jrblanco.proyectoguachat.aplication.usecase.RegistroUseCase
 import com.jrblanco.proyectoguachat.infraestructure.FirebaseAuthRepository
 import com.jrblanco.proyectoguachat.infraestructure.FirebaseStorageRepository
 import com.jrblanco.proyectoguachat.infraestructure.FirestoreDatabaseRepository
-import com.jrblanco.proyectoguachat.login.domain.model.Usuario
+import com.jrblanco.proyectoguachat.domain.model.Usuario
 import kotlinx.coroutines.launch
 
 class RegistroViewModel : ViewModel() {
-    private val auth = Firebase.auth
-    private val db = Firebase.firestore
 
-    private val loginRepository = FirebaseAuthRepository()
+    private val registroRepository = FirebaseAuthRepository()
     private val storageRepository = FirebaseStorageRepository()
-    private val firestoreDBRepository = FirestoreDatabaseRepository()
+    private val DBRepository = FirestoreDatabaseRepository()
+
+    //---- Casos de uso
+    private val registroUseCase = RegistroUseCase(registroRepository)
+    private val guardarUserUseCase = GuardarUserDBUseCase(DBRepository)
+    private val guardarImagenUseCase = GuardarImagenUsecase(storageRepository)
 
     private val _nombre = MutableLiveData<String>("")
     val nombre: LiveData<String> = _nombre
@@ -53,7 +59,6 @@ class RegistroViewModel : ViewModel() {
         _email.value = email
         _isResgistroEnable.value = Patterns.EMAIL_ADDRESS.matcher(_email.value)
             .matches() && _pass.value.equals(_vpass.value) && !_pass.value.isNullOrEmpty() && !_vpass.value.isNullOrEmpty()
-        //  _isResgistroEnable.value = _email.value!!.isNotEmpty() && _pass.value!!.isNotEmpty()
     }
 
     fun onChangePass(pass: String, vpass: String) {
@@ -61,8 +66,6 @@ class RegistroViewModel : ViewModel() {
         _vpass.value = vpass
         _isResgistroEnable.value = Patterns.EMAIL_ADDRESS.matcher(_email.value)
             .matches() && _pass.value.equals(_vpass.value) && !_pass.value.isNullOrEmpty() && !_vpass.value.isNullOrEmpty()
-
-        //_isResgistroEnable.value = _email.value!!.isNotEmpty() && _pass.value!!.isNotEmpty()
     }
 
     fun onChangeImageUri(uri: Uri) {
@@ -78,7 +81,7 @@ class RegistroViewModel : ViewModel() {
      */
     fun crearUsuario(funcion: (Int) -> Unit) = viewModelScope.launch {
         try {
-            val isSuccessful = loginRepository.newUserLogin(_email.value!!, _pass.value!!)
+            val isSuccessful = registroUseCase.newUser(_email.value!!, _pass.value!!)
             if (isSuccessful) {
                 guardarImagenUsuario(imageUri.value)    //Guardar Imagen
                 val usuario = Usuario(nombre = _nombre.value!!,email = _email.value!!)
@@ -99,9 +102,9 @@ class RegistroViewModel : ViewModel() {
      * Método que guarda en la base de datos de Firestore el usuario
      */
     private fun guardarUsuarioDB(user: Usuario) {
-        firestoreDBRepository.saveUser(user,
+        guardarUserUseCase.saveUser(user,
             onSuccess = {Log.d("JR_LOG", "Usuario guardado con éxito")},
-            onFailure = {Log.d("JR_LOG", "Error al guardar el usuario. ${it.message}")})
+            onFailure = { Log.d("JR_LOG", "Error al guardar el usuario. ${it.message}") })
     }
 
     /**
@@ -109,7 +112,7 @@ class RegistroViewModel : ViewModel() {
      * El nombre del fichero en el servidor es el ID de google más la terminación .imagen
      */
     private fun guardarImagenUsuario(imagen: Uri?) {
-        storageRepository.saveImagen(imagen,
+        guardarImagenUseCase.saveImagen(imagen,
             onSuccess = {Log.d("JR_LOG", "Imagen cargada con existo")},
             onFailure = {Log.d("JR_LOG", "Error subiendo la imagen")})
     }
