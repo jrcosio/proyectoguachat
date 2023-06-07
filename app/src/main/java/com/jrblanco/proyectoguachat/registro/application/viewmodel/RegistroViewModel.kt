@@ -1,4 +1,4 @@
-package com.jrblanco.proyectoguachat.ui.screen.registro
+package com.jrblanco.proyectoguachat.registro.application.viewmodel
 
 import android.net.Uri
 import android.util.Log
@@ -11,10 +11,10 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.jrblanco.proyectoguachat.data.firebase.FirebaseAuthRepository
-import com.jrblanco.proyectoguachat.data.firebase.FirebaseStorageRepository
-import com.jrblanco.proyectoguachat.data.firebase.FirestoreDatabaseRepository
-import com.jrblanco.proyectoguachat.data.model.UsuarioModel
+import com.jrblanco.proyectoguachat.infraestructure.FirebaseAuthRepository
+import com.jrblanco.proyectoguachat.infraestructure.FirebaseStorageRepository
+import com.jrblanco.proyectoguachat.infraestructure.FirestoreDatabaseRepository
+import com.jrblanco.proyectoguachat.login.domain.model.Usuario
 import kotlinx.coroutines.launch
 
 class RegistroViewModel : ViewModel() {
@@ -81,7 +81,7 @@ class RegistroViewModel : ViewModel() {
             val isSuccessful = loginRepository.newUserLogin(_email.value!!, _pass.value!!)
             if (isSuccessful) {
                 guardarImagenUsuario(imageUri.value)    //Guardar Imagen
-                val usuario = UsuarioModel(nombre = _nombre.value!!,email = _email.value!!)
+                val usuario = Usuario(nombre = _nombre.value!!,email = _email.value!!)
                 guardarUsuarioDB(usuario)               //Guardar Usuario BD
                 funcion(0)
             } else {
@@ -98,7 +98,7 @@ class RegistroViewModel : ViewModel() {
     /**
      * Método que guarda en la base de datos de Firestore el usuario
      */
-    private fun guardarUsuarioDB(user: UsuarioModel) {
+    private fun guardarUsuarioDB(user: Usuario) {
         firestoreDBRepository.saveUser(user,
             onSuccess = {Log.d("JR_LOG", "Usuario guardado con éxito")},
             onFailure = {Log.d("JR_LOG", "Error al guardar el usuario. ${it.message}")})

@@ -1,4 +1,4 @@
-package com.jrblanco.proyectoguachat.ui.screen.login
+package com.jrblanco.proyectoguachat.login.application.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -6,9 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.jrblanco.proyectoguachat.data.firebase.FirebaseAuthRepository
-import com.jrblanco.proyectoguachat.data.firebase.FirestoreDatabaseRepository
-import com.jrblanco.proyectoguachat.data.model.UsuarioModel
+import com.jrblanco.proyectoguachat.infraestructure.FirebaseAuthRepository
+import com.jrblanco.proyectoguachat.infraestructure.FirestoreDatabaseRepository
+import com.jrblanco.proyectoguachat.login.domain.model.Usuario
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
@@ -72,7 +72,7 @@ class LoginViewModel : ViewModel() {
                 //Guardar datos en la base de datos
                 //  val usuario = UsuarioModel(nombre = _nombre.value!!,email = _email.value!!)
                 val auth = loginRepository.auth
-                val usuario = UsuarioModel(nombre = auth.currentUser?.displayName.toString(),email = auth.currentUser?.email.toString())
+                val usuario = Usuario(nombre = auth.currentUser?.displayName.toString(),email = auth.currentUser?.email.toString())
                 dataBaseRepository.saveUser(usuario,
                         onSuccess = {Log.d("JR_LOG", "Usuario guardado con éxito")},
                         onFailure = {Log.d("JR_LOG", "Error al guardar el usuario. ${it.message}")})

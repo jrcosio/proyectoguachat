@@ -1,6 +1,6 @@
-package com.jrblanco.proyectoguachat.data.model
+package com.jrblanco.proyectoguachat.login.domain.model
 
-data class UsuarioModel(
+data class Usuario(
     var idGoogle: String = "",
     var nombre: String = "",
     var email: String = "",
