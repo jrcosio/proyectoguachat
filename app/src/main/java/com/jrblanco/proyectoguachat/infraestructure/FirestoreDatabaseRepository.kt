@@ -78,4 +78,24 @@ class FirestoreDatabaseRepository : DataBaseRepository {
                 onSuccess(allContactUser)
             }
     }
+
+    override fun loadContact(idGoogle: String, onSuccess: (Usuario) -> Unit) {
+        val auth = Firebase.auth
+
+        if (idGoogle != null) {
+            db.collection(Usuario.USUARIOS)
+                .document(idGoogle)
+                .get()
+                .addOnSuccessListener {
+                    if (it.exists()) {
+                        val usuario = it.toObject<Usuario>()
+                        if (usuario != null) {
+                            onSuccess(usuario)
+                        }
+                    }
+                }
+        }
+    }
+
+
 }

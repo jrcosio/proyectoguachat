@@ -24,7 +24,6 @@ class HomeViewModel : ViewModel() {
 
     //---- Casos de uso ----
     private val loadUserUseCase = LoadUserDBUseCase(dataBaseRepository)
-    private val obtenerImagenUseCase = ObtenerImagenUseCase(storageRepository)
     private val allUsersDBUseCase = AllUsersDBUseCase(dataBaseRepository)
     private val newContactUserCase = NewContactUserCase(dataBaseRepository)
     private val allContactUserBDUseCase = AllContactUserBDUseCase(dataBaseRepository)

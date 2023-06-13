@@ -12,6 +12,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.jrblanco.proyectoguachat.R
+import com.jrblanco.proyectoguachat.aplication.viewmodels.ChatViewModel
 import com.jrblanco.proyectoguachat.aplication.viewmodels.HomeViewModel
 import com.jrblanco.proyectoguachat.modelo.RutasNav
 import com.jrblanco.proyectoguachat.ui.screen.login.LoginView
@@ -58,9 +59,12 @@ fun Navegacion(navControl: NavHostController) {
                 }
             }
         }
-        composable(RutasNav.Login.route) { LoginView(navControl, LoginViewModel()) }
-        composable(RutasNav.Registro.route) { RegistroView(navControl, RegistroViewModel()) }
-        composable(RutasNav.Home.route) { HomeView(navControl, HomeViewModel()) }
-        composable(RutasNav.Chat.route) { ChatView(navControl)}
+        composable(RutasNav.Login.route) { LoginView(navControl = navControl, loginViewModel = LoginViewModel()) }
+        composable(RutasNav.Registro.route) { RegistroView(navControl = navControl, regViewModel = RegistroViewModel()) }
+        composable(RutasNav.Home.route) { HomeView(navControl = navControl, viewModel = HomeViewModel()) }
+        composable(RutasNav.Chat.route) {
+            val userId = it.arguments?.getString("idGoogle").orEmpty()
+            ChatView(navControl = navControl, viewModel = ChatViewModel(), idGoogle = userId)
+        }
     }
 }

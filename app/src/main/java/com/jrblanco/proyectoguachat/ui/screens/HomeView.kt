@@ -112,7 +112,7 @@ fun HomeView(navControl: NavHostController, viewModel: HomeViewModel) {
                     if (filtro != null) {
                         ContactosView(listaContactos = filtro) { user ->
                             viewModel.onSeccionChange(3)
-                            navControl.navigate(RutasNav.Chat.route)
+                            navControl.navigate(RutasNav.Chat.chatRouteWithId(user.idGoogle))
                         }
                     }
                 }

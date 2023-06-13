@@ -36,9 +36,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.jrblanco.proyectoguachat.R
+import com.jrblanco.proyectoguachat.aplication.viewmodels.ChatViewModel
 import com.jrblanco.proyectoguachat.domain.model.Usuario
 import com.jrblanco.proyectoguachat.ui.theme.Azul30
 import com.jrblanco.proyectoguachat.ui.theme.Azul40
@@ -46,7 +48,7 @@ import com.jrblanco.proyectoguachat.ui.theme.Green30
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatView(navControl: NavHostController) {
+fun ChatView(navControl: NavHostController, viewModel: ChatViewModel, idGoogle: String) {
     val user = Usuario(
         "jhghj",
         "Sandra",
