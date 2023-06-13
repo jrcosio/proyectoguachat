@@ -8,11 +8,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.jrblanco.proyectoguachat.aplication.usecase.GuardarImagenUsecase
 import com.jrblanco.proyectoguachat.aplication.usecase.GuardarUserDBUseCase
+import com.jrblanco.proyectoguachat.aplication.usecase.ObtenerImagenUseCase
 import com.jrblanco.proyectoguachat.aplication.usecase.RegistroUseCase
 import com.jrblanco.proyectoguachat.infraestructure.FirebaseAuthRepository
 import com.jrblanco.proyectoguachat.infraestructure.FirebaseStorageRepository
@@ -30,6 +32,7 @@ class RegistroViewModel : ViewModel() {
     private val registroUseCase = RegistroUseCase(registroRepository)
     private val guardarUserUseCase = GuardarUserDBUseCase(DBRepository)
     private val guardarImagenUseCase = GuardarImagenUsecase(storageRepository)
+    private val obtenerImagenUseCase = ObtenerImagenUseCase(storageRepository)
 
     private val _nombre = MutableLiveData<String>("")
     val nombre: LiveData<String> = _nombre
@@ -81,11 +84,20 @@ class RegistroViewModel : ViewModel() {
      */
     fun crearUsuario(funcion: (Int) -> Unit) = viewModelScope.launch {
         try {
-            val isSuccessful = registroUseCase.newUser(_email.value!!, _pass.value!!)
+            val isSuccessful = registroUseCase(_email.value!!, _pass.value!!)
             if (isSuccessful) {
+                val auth = FirebaseAuth.getInstance().currentUser
                 guardarImagenUsuario(imageUri.value)    //Guardar Imagen
-                val usuario = Usuario(nombre = _nombre.value!!,email = _email.value!!)
-                guardarUsuarioDB(usuario)               //Guardar Usuario BD
+
+                val usuario = Usuario(
+                    idGoogle = auth?.uid.toString(),
+                    nombre = _nombre.value!!,
+                    email = _email.value!!,
+                )
+                obtenerImagenUseCase(auth?.uid.toString()) {
+                    usuario.avatar = it
+                    guardarUsuarioDB(usuario)        //Guardar Usuario en la BD cuando tenga la URL de la imagen
+                }
                 funcion(0)
             } else {
                 Log.d("JR_LOG", "Error creando usuario")
@@ -102,8 +114,8 @@ class RegistroViewModel : ViewModel() {
      * Método que guarda en la base de datos de Firestore el usuario
      */
     private fun guardarUsuarioDB(user: Usuario) {
-        guardarUserUseCase.saveUser(user,
-            onSuccess = {Log.d("JR_LOG", "Usuario guardado con éxito")},
+        guardarUserUseCase(user,
+            onSuccess = { Log.d("JR_LOG", "Usuario guardado con éxito") },
             onFailure = { Log.d("JR_LOG", "Error al guardar el usuario. ${it.message}") })
     }
 
@@ -112,9 +124,10 @@ class RegistroViewModel : ViewModel() {
      * El nombre del fichero en el servidor es el ID de google más la terminación .imagen
      */
     private fun guardarImagenUsuario(imagen: Uri?) {
-        guardarImagenUseCase.saveImagen(imagen,
-            onSuccess = {Log.d("JR_LOG", "Imagen cargada con existo")},
-            onFailure = {Log.d("JR_LOG", "Error subiendo la imagen")})
+        guardarImagenUseCase(imagen,
+            onSuccess = { Log.d("JR_LOG", "Imagen cargada con existo") },
+            onFailure = { Log.d("JR_LOG", "Error subiendo la imagen") })
+
     }
 
 }

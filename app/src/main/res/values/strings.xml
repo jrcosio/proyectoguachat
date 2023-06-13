@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ProyectoGuaChat</string>
+    <string name="app_name">GuaChat</string>
     <string name="android">Android</string>
     <!-- Texto Screen del Login -->
     <string name="usuario_login">Usuario</string>
@@ -10,4 +10,7 @@
     <string name="indentificarse_con_login">tambien puede indentificarse con</string>
     <string name="no_tengo_usuario_login">"No tengo usuario, "</string>
     <string name="quiero_registrarme_login">quiero registrarme</string>
+    <!-- Texto Screen Home -->
+    <string name="iniciar_chat_nuevo">Iniciar chat nuevo</string>
+
 </resources>

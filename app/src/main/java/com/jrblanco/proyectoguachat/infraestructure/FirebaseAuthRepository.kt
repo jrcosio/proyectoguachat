@@ -1,5 +1,6 @@
 package com.jrblanco.proyectoguachat.infraestructure
 
+import android.util.Log
 import android.util.Patterns
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
@@ -7,7 +8,7 @@ import com.jrblanco.proyectoguachat.domain.repository.LoginRepository
 import com.jrblanco.proyectoguachat.domain.repository.RegistroRepository
 import kotlinx.coroutines.tasks.await
 
-class FirebaseAuthRepository: LoginRepository, RegistroRepository {
+class FirebaseAuthRepository : LoginRepository, RegistroRepository {
 
     var auth = FirebaseAuth.getInstance()
         private set     //solo de lectura desde fuera de la clase
@@ -29,6 +30,17 @@ class FirebaseAuthRepository: LoginRepository, RegistroRepository {
         } catch (e: Exception) {
             false
         }
+    }
+
+    override fun newPassword(password: String) {
+        auth.currentUser?.updatePassword(password)?.addOnCompleteListener {
+                if (it.isSuccessful) {
+                    Log.d("JR LOG", "Password cambiado con éxito")
+                } else {
+                    Log.d("JR LOG", "Error cambiando Password")
+                }
+
+            }
     }
 
     override suspend fun newUser(email: String, password: String): Boolean {

@@ -6,7 +6,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.firebase.auth.FirebaseAuth
 import com.jrblanco.proyectoguachat.aplication.usecase.GuardarUserDBUseCase
+import com.jrblanco.proyectoguachat.aplication.usecase.LoginGoogleUseCase
 import com.jrblanco.proyectoguachat.aplication.usecase.LoginUseCase
 import com.jrblanco.proyectoguachat.aplication.usecase.RegistroUseCase
 import com.jrblanco.proyectoguachat.infraestructure.FirebaseAuthRepository
@@ -21,6 +23,7 @@ class LoginViewModel : ViewModel() {
 
     //---- Instaciamos los casos de uso
     private val loginUseCase = LoginUseCase(loginFirebaseRepository)    //Inyecto el repository
+    private val loginGoogleUseCase = LoginGoogleUseCase(loginFirebaseRepository)
     private val guardarUserUseCase = GuardarUserDBUseCase(dataBaseRepository)
 
     private val _user = MutableLiveData<String>()
@@ -52,7 +55,7 @@ class LoginViewModel : ViewModel() {
 
     fun login(loginOk: () -> Unit) = viewModelScope.launch {
         try {
-            val isSuccessful = loginUseCase.login(_user.value!!, _password.value!!)
+            val isSuccessful = loginUseCase(_user.value!!, _password.value!!)
             if (isSuccessful) {
                 loginOk()
                 _isErrorLogin.value = false
@@ -73,16 +76,20 @@ class LoginViewModel : ViewModel() {
 
             val idToken = account?.idToken
 
-            val isSuccessful = idToken?.let { loginUseCase.loginGoogle(it) }
+            val isSuccessful = idToken?.let { loginGoogleUseCase(it) }
             if (isSuccessful == true) {
                 Log.d("JR - LOG", "Login con google: CORRECTO")
                 //Guardar datos en la base de datos
-                //  val usuario = UsuarioModel(nombre = _nombre.value!!,email = _email.value!!)
-                val auth = loginUseCase.auth
-                val usuario = Usuario(nombre = auth.currentUser?.displayName.toString(),email = auth.currentUser?.email.toString())
-                guardarUserUseCase.saveUser(usuario,
-                        onSuccess = {Log.d("JR_LOG", "Usuario guardado con éxito")},
-                        onFailure = { Log.d("JR_LOG", "Error al guardar el usuario. ${it.message}") })
+                val auth = FirebaseAuth.getInstance()
+                val usuario = Usuario(
+                    idGoogle = auth.currentUser?.uid.toString(),
+                    nombre = auth.currentUser?.displayName.toString(),
+                    email = auth.currentUser?.email.toString(),
+                    avatar = "${auth.currentUser?.photoUrl}"
+                )
+                guardarUserUseCase(usuario,
+                    onSuccess = { Log.d("JR_LOG", "Usuario guardado con éxito") },
+                    onFailure = { Log.d("JR_LOG", "Error al guardar el usuario. ${it.message}") })
 
                 home()
             }

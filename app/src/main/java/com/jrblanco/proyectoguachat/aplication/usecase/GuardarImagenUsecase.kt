@@ -4,8 +4,7 @@ import android.net.Uri
 import com.jrblanco.proyectoguachat.domain.repository.ImagenRepository
 
 class GuardarImagenUsecase(private val imagenRepository: ImagenRepository) {
-
-    fun saveImagen(imageUri: Uri?, onSuccess: () -> Unit, onFailure: () -> Unit) {
+    operator fun invoke(imageUri: Uri?, onSuccess: () -> Unit, onFailure: () -> Unit) {
         imagenRepository.saveImagen(imageUri, onSuccess, onFailure)
     }
 }

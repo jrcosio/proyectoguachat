@@ -57,7 +57,7 @@ import com.jrblanco.proyectoguachat.ui.screen.componentes.TextFieldEmail
 import com.jrblanco.proyectoguachat.ui.screen.componentes.TextFieldPassword
 import com.jrblanco.proyectoguachat.ui.screen.componentes.TextFieldSoloTexto
 import com.jrblanco.proyectoguachat.ui.theme.Pink80
-import com.jrblanco.proyectoguachat.ui.theme.Purple40
+import com.jrblanco.proyectoguachat.ui.theme.Azul40
 import com.jrblanco.proyectoguachat.ui.theme.Red60
 
 
@@ -137,7 +137,7 @@ private fun CabeceraRegistro() {
             .fillMaxWidth()
             .height(160.dp)
             .clip(RoundedCornerShape(bottomStart = 120.dp))
-            .background(Purple40)
+            .background(Azul40)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Image(
@@ -181,7 +181,7 @@ private fun AvatarUsuario(
             modifier = Modifier
                 .size(130.dp)
                 .clip(CircleShape)
-                .border(2.dp, Purple40, CircleShape),
+                .border(2.dp, Azul40, CircleShape),
             contentScale = ContentScale.Crop
         )
 
