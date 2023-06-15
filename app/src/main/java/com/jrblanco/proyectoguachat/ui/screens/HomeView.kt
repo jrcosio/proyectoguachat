@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.jrblanco.proyectoguachat.aplication.viewmodels.HomeViewModel
 import com.jrblanco.proyectoguachat.domain.model.Chats
+import com.jrblanco.proyectoguachat.domain.model.Usuario
 import com.jrblanco.proyectoguachat.modelo.RutasNav
 import com.jrblanco.proyectoguachat.ui.components.AddContacto
 import com.jrblanco.proyectoguachat.ui.components.FABStartChat
@@ -56,28 +57,6 @@ fun HomeView(navControl: NavHostController, viewModel: HomeViewModel) {
     val listaContactos by viewModel.allContacts.observeAsState(initial = null)
 
     val context = LocalContext.current
-
-    val listaChats = listOf<Chats>(
-        Chats("ZZZZ", "Steve Jobs", "Hola mundo", "Jue", "Hola mundo", false, "", 0),
-        Chats("ZZZZ1", "Pedro", "Hola mundo", "Jue", "Hola mundo", false, "", 21),
-        Chats(
-            "ZZZZ",
-            "JoseR",
-            "Hola mundo",
-            "Jue",
-            "1234567890123456789012345678901234567890",
-            false,
-            "",
-            1
-        ),
-        Chats("ZZZZ", "Grupo", "Sandra", "Jue", "bla bla bla", true, "", 33),
-        Chats("ZZZZ", "Sandra", "Hola mundo", "Jue", "Hola mundo", false, "", 33),
-        Chats("ZZZZ", "Piti", "Hola mundo", "Jue", "Pablo eres un pringao", false, "", 33),
-        Chats("ZZZZ", "Pablo", "Hola mundo", "Jue", "Soy monger papa", false, "", 9),
-        Chats("ZZZZ", "Emma", "Hola mundo", "Jue", "Prueba de textr", false, "", 9),
-        Chats("ZZZZ", "Mama", "Hola mundo", "Jue", "12345678901234567890123456789", false, "", 9)
-    )
-
 
     Scaffold(
         topBar = {
@@ -118,8 +97,8 @@ fun HomeView(navControl: NavHostController, viewModel: HomeViewModel) {
                 }
 
                 1 -> {
-                    val filtro =
-                        listaChats.filter { it.title.contains(textSearch, ignoreCase = true) }
+                    val filtro = listOf<Chats>()
+                    //    listaChats.filter { it.title.contains(textSearch, ignoreCase = true) }
                     ListaChatsView(listaChats = filtro)
                 }
 

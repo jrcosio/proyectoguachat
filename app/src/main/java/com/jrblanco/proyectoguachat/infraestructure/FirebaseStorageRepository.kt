@@ -9,16 +9,20 @@ import com.jrblanco.proyectoguachat.domain.repository.ImagenRepository
 class FirebaseStorageRepository : ImagenRepository {
     private val storage = FirebaseStorage.getInstance()
 
-    override fun saveImagen(imageUri: Uri?, onSuccess: () -> Unit, onFailure: () -> Unit) {
+    override fun saveImagen(imageUri: Uri?, onSuccess: (String) -> Unit, onFailure: () -> Unit) {
         val storageRef = storage.reference
         val auth = FirebaseAuth.getInstance()
 
         if (imageUri != null) {
             val imageRef = storageRef.child("avatar_usuarios/${auth.uid}.imagen")
             imageRef.putFile(imageUri)
-                .addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        onSuccess()
+                .addOnSuccessListener {
+                    // Obtener la dirección de la imagen
+                    imageRef.downloadUrl.addOnSuccessListener { downloadUrl ->
+                        Log.d("JR LOG","saveImagen: $downloadUrl")
+                        onSuccess(downloadUrl.toString())
+                    }.addOnFailureListener {
+                        onFailure()
                     }
                 }
                 .addOnFailureListener {
@@ -36,6 +40,7 @@ class FirebaseStorageRepository : ImagenRepository {
                 val imageUrl = uri.toString()
                 onSuccess(imageUrl)
             }
+            .addOnFailureListener { Log.e("JR LOG ERROR","Error leyendo URL de Imagen") }
 
     }
 

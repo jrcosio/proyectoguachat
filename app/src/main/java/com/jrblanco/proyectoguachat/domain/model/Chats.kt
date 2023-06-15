@@ -1,12 +1,14 @@
 package com.jrblanco.proyectoguachat.domain.model
 
+import com.google.firebase.Timestamp
+
 data class Chats(
-    var idChat: String,
-    var title: String,
-    var subTitle: String,
-    var date: String,
-    var lastMessage: String,
-    var tipo: Boolean,
-    var icon: String,
-    var countNewMessage: Int
+    var idChat: String = "",
+    var date: Timestamp? = null,
+    var lastMessage: String = "",
+    var isGrupo: Boolean = false,
+    var title: String = "",
+    var subTitle: String = "",
+    var icon: String = "",
+  //  var countNewMessage: Int = -1,
 )

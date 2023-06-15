@@ -88,10 +88,10 @@ fun RegistroView(navControl: NavHostController, regViewModel: RegistroViewModel)
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CabeceraRegistro()
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             AvatarUsuario(imageUri, pickMedia)
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             TextFieldSoloTexto(
                 value = nombre,
@@ -135,7 +135,7 @@ private fun CabeceraRegistro() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(160.dp)
+            .height(150.dp)
             .clip(RoundedCornerShape(bottomStart = 120.dp))
             .background(Azul40)
     ) {

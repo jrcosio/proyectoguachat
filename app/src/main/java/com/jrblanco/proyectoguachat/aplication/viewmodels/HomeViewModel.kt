@@ -27,6 +27,7 @@ class HomeViewModel : ViewModel() {
     private val allUsersDBUseCase = AllUsersDBUseCase(dataBaseRepository)
     private val newContactUserCase = NewContactUserCase(dataBaseRepository)
     private val allContactUserBDUseCase = AllContactUserBDUseCase(dataBaseRepository)
+    private val obtenerImagenUseCase = ObtenerImagenUseCase(storageRepository)
 
     private val _seccion = MutableLiveData<Int>()
     val seccion: LiveData<Int> = _seccion

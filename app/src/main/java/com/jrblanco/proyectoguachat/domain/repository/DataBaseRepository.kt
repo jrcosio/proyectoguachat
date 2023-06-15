@@ -9,4 +9,8 @@ interface DataBaseRepository {
     fun newContacto(idGoogle: String, contactoNuevo: Usuario, onSuccess: () -> Unit)
     fun allContactos(idGoogle: String, onSuccess: (List<Usuario>) -> Unit)
     fun loadContact(idGoogle: String, onSuccess: (Usuario) -> Unit)
+
+    //--- Métodos para los chats ---
+    fun loadChatWithContact(idGoogleContact: String, onSuccess: (Usuario) -> Unit)
+    fun newChat(usuario: Usuario, contact: Usuario)
 }

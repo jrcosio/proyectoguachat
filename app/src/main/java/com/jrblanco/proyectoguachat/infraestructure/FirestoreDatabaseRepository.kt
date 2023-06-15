@@ -1,17 +1,21 @@
 package com.jrblanco.proyectoguachat.infraestructure
 
-import com.google.firebase.auth.EmailAuthProvider
-import com.google.firebase.auth.GoogleAuthProvider
+import android.util.Log
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import com.jrblanco.proyectoguachat.domain.model.ChatUsuario
 import com.jrblanco.proyectoguachat.domain.model.Usuario
 import com.jrblanco.proyectoguachat.domain.repository.DataBaseRepository
 
 class FirestoreDatabaseRepository : DataBaseRepository {
     private val USUARIOS = "usuarios"
     private val CONTACTOS = "contactos"
+    private val MISCHATS = "mischat"
+    private val CHATS = "chats"
+
     private val db = Firebase.firestore
 
     override fun saveUser(user: Usuario, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
@@ -95,6 +99,68 @@ class FirestoreDatabaseRepository : DataBaseRepository {
                     }
                 }
         }
+    }
+
+    override fun loadChatWithContact(idGoogleContact: String, onSuccess: (Usuario) -> Unit) {
+        val auth = Firebase.auth.currentUser
+        var chat: Usuario? = null
+
+        if (auth != null) {
+            db.collection(Usuario.USUARIOS).document(auth.uid).collection(MISCHATS)
+                .get()
+                .addOnSuccessListener { query ->
+                    query.forEach { document ->
+                        val chatContact = document.toObject<Usuario>()
+                        if (chatContact.idGoogle.equals(idGoogleContact)) {
+                            chat = chatContact
+                        }
+                    }
+                    chat?.let { onSuccess(it) }
+                }
+                .addOnFailureListener { Log.d("JR LOG", "Error cargando chat con contacto") }
+        }
+    }
+
+    override fun newChat(usuario: Usuario, contact: Usuario) {
+
+        val datosNewChat = hashMapOf<String, Any>(
+            "date" to Timestamp.now(),
+            "lastMessage" to "",
+            "isGrupo" to false,
+            "title" to "",
+            "subTitle" to "",
+            "icon" to ""
+        )
+
+        db.collection(CHATS)
+            .add(datosNewChat)
+            .addOnSuccessListener { document ->
+                val idChat = document.id //Obtengo el Id del Chat
+                //En el Usuario
+                val chatContacto = ChatUsuario(
+                    idchat = idChat,
+                    isGrupo = false,
+                    idGoogle = contact.idGoogle,
+                    nombre = contact.nombre,
+                    icono = contact.avatar
+                )
+                db.collection(USUARIOS).document(usuario.idGoogle).collection(MISCHATS)
+                    .document(idChat)
+                    .set(chatContacto)
+                    .addOnSuccessListener { Log.d("JR LOG","Chat creado en contactos del usuario") }
+                //En el Contacto
+                val chatUsuario = ChatUsuario(
+                    idchat = idChat,
+                    isGrupo = false,
+                    idGoogle = usuario.idGoogle,
+                    nombre = usuario.nombre,
+                    icono = usuario.avatar
+                )
+                db.collection(USUARIOS).document(contact.idGoogle).collection(MISCHATS)
+                    .document(idChat)
+                    .set(chatUsuario)
+                    .addOnSuccessListener { Log.d("JR LOG","Chat creado en contactos del contacto") }
+            }
     }
 
 

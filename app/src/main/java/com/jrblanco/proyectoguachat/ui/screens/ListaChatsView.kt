@@ -83,14 +83,20 @@ fun ItemCard(item: Chats) {
                     style = TextStyle(fontSize = 16.sp),
                     fontWeight = FontWeight.Bold,
                 )
-                if (item.tipo) {            //is es un grupo
+                if (item.isGrupo) {            //is es un grupo
                     Text(
                         text = item.subTitle,
                         style = TextStyle(fontSize = 14.sp),
                     )
-                } else { Spacer(modifier = Modifier.size(10.dp)) }
+                } else {
+                    Spacer(modifier = Modifier.size(10.dp))
+                }
                 Text(
-                    text = if (item.lastMessage.length < 30) item.lastMessage else "${item.lastMessage.take(30)}...",
+                    text = if (item.lastMessage.length < 30) item.lastMessage else "${
+                        item.lastMessage.take(
+                            30
+                        )
+                    }...",
                     style = TextStyle(fontSize = 14.sp),
                     color = Green10
                 )
@@ -98,7 +104,7 @@ fun ItemCard(item: Chats) {
             }
             Column() {
                 Text(
-                    text = item.date,
+                    text = item.date.toString(),
                     modifier = Modifier.padding(bottom = 22.dp),
                     style = TextStyle(fontSize = 14.sp),
                     color = Green10
@@ -110,7 +116,7 @@ fun ItemCard(item: Chats) {
                         .background(PurpleGrey40)
                 ) {
                     Text(
-                        text = item.countNewMessage.toString(),
+                        text = "0",
                         style = TextStyle(fontSize = 12.sp),
                         modifier = Modifier.padding(3.dp),
                         color = Color.White

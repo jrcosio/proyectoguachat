@@ -23,6 +23,8 @@ import com.jrblanco.proyectoguachat.domain.model.Usuario
 import kotlinx.coroutines.launch
 
 class RegistroViewModel : ViewModel() {
+    private val avatarDefault =
+        "https://firebasestorage.googleapis.com/v0/b/proyecto-guachat-dam.appspot.com/o/avatar_usuarios%2Favatar.png?alt=media&token=73eaf428-993b-4d0a-9216-f6062e614020"
 
     private val registroRepository = FirebaseAuthRepository()
     private val storageRepository = FirebaseStorageRepository()
@@ -83,22 +85,22 @@ class RegistroViewModel : ViewModel() {
      *  2: El email o la contraseña no son válidos
      */
     fun crearUsuario(funcion: (Int) -> Unit) = viewModelScope.launch {
+
         try {
             val isSuccessful = registroUseCase(_email.value!!, _pass.value!!)
             if (isSuccessful) {
                 val auth = FirebaseAuth.getInstance().currentUser
-                guardarImagenUsuario(imageUri.value)    //Guardar Imagen
-
                 val usuario = Usuario(
                     idGoogle = auth?.uid.toString(),
                     nombre = _nombre.value!!,
                     email = _email.value!!,
+                    avatar = avatarDefault
                 )
-                obtenerImagenUseCase(auth?.uid.toString()) {
+                guardarImagenUsuario(imageUri.value) {   //Guardar Imagen
                     usuario.avatar = it
-                    guardarUsuarioDB(usuario)        //Guardar Usuario en la BD cuando tenga la URL de la imagen
+                    guardarUsuarioDB(usuario)           //Cuando tiene la imagen lo guarda.
+                    funcion(0)
                 }
-                funcion(0)
             } else {
                 Log.d("JR_LOG", "Error creando usuario")
                 funcion(1)
@@ -123,9 +125,12 @@ class RegistroViewModel : ViewModel() {
      * Método que guarda en Firebase Storage la imagen del avatar
      * El nombre del fichero en el servidor es el ID de google más la terminación .imagen
      */
-    private fun guardarImagenUsuario(imagen: Uri?) {
+    private fun guardarImagenUsuario(imagen: Uri?, onSuccess: (String) -> Unit) {
         guardarImagenUseCase(imagen,
-            onSuccess = { Log.d("JR_LOG", "Imagen cargada con existo") },
+            onSuccess = {
+                Log.d("JR_LOG", "Imagen guardada en Storage con éxito")
+                onSuccess(it)
+            },
             onFailure = { Log.d("JR_LOG", "Error subiendo la imagen") })
 
     }
