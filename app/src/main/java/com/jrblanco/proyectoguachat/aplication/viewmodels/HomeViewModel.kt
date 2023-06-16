@@ -11,23 +11,27 @@ import com.google.firebase.auth.FirebaseAuth
 import com.jrblanco.proyectoguachat.R
 import com.jrblanco.proyectoguachat.aplication.usecase.AllContactUserBDUseCase
 import com.jrblanco.proyectoguachat.aplication.usecase.AllUsersDBUseCase
+import com.jrblanco.proyectoguachat.aplication.usecase.LoadListChatUserUseCase
 import com.jrblanco.proyectoguachat.aplication.usecase.LoadUserDBUseCase
 import com.jrblanco.proyectoguachat.aplication.usecase.NewContactUserCase
 import com.jrblanco.proyectoguachat.aplication.usecase.ObtenerImagenUseCase
+import com.jrblanco.proyectoguachat.domain.model.Chats
 import com.jrblanco.proyectoguachat.domain.model.Usuario
 import com.jrblanco.proyectoguachat.infraestructure.FirebaseStorageRepository
 import com.jrblanco.proyectoguachat.infraestructure.FirestoreDatabaseRepository
 
 class HomeViewModel : ViewModel() {
     private val dataBaseRepository = FirestoreDatabaseRepository()
-    private val storageRepository = FirebaseStorageRepository()
+    //private val storageRepository = FirebaseStorageRepository()
 
     //---- Casos de uso ----
     private val loadUserUseCase = LoadUserDBUseCase(dataBaseRepository)
     private val allUsersDBUseCase = AllUsersDBUseCase(dataBaseRepository)
     private val newContactUserCase = NewContactUserCase(dataBaseRepository)
     private val allContactUserBDUseCase = AllContactUserBDUseCase(dataBaseRepository)
-    private val obtenerImagenUseCase = ObtenerImagenUseCase(storageRepository)
+
+    //private val obtenerImagenUseCase = ObtenerImagenUseCase(storageRepository)
+    private val loadListChatUserUseCase = LoadListChatUserUseCase(dataBaseRepository)
 
     private val _seccion = MutableLiveData<Int>()
     val seccion: LiveData<Int> = _seccion
@@ -53,6 +57,8 @@ class HomeViewModel : ViewModel() {
     private val _allContacts = MutableLiveData<List<Usuario>>()
     val allContacts: LiveData<List<Usuario>> = _allContacts
 
+    private val _listaChats = MutableLiveData<List<Chats>>()
+    val listaChats: LiveData<List<Chats>> = _listaChats
 
     init {
         initUsuario()
@@ -105,15 +111,34 @@ class HomeViewModel : ViewModel() {
         FirebaseAuth.getInstance().signOut()
     }
 
-    fun initUsuario() { loadUserUseCase { _usuario.value = it } }
-    fun getAllUsers() { allUsersDBUseCase { _allUsuario.value = it } }
+    fun initUsuario() {
+        loadUserUseCase {
+            _usuario.value = it
+            getAllChatUser()
+            getAllContact()
+        }
+    }
+
+    fun getAllUsers() {
+        allUsersDBUseCase { _allUsuario.value = it }
+    }
+
     fun newContacto(nuevoContacto: Usuario, onSuccess: () -> Unit) {
         if (_usuario.value!!.idGoogle != nuevoContacto.idGoogle)
             newContactUserCase(_usuario.value!!.idGoogle, nuevoContacto) { onSuccess() }
     }
+
     fun getAllContact() {
         allContactUserBDUseCase(_usuario.value!!.idGoogle) {
             _allContacts.value = it
+        }
+    }
+
+    fun getAllChatUser() {
+        _usuario.value?.let {
+            loadListChatUserUseCase(it) { list ->
+                _listaChats.value = list
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package com.jrblanco.proyectoguachat.ui.screen.principal
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -55,6 +56,7 @@ fun HomeView(navControl: NavHostController, viewModel: HomeViewModel) {
     val textAddContact by viewModel.textAddContact.observeAsState("")
     val isAddContact by viewModel.isAddContact.observeAsState(initial = false)
     val listaContactos by viewModel.allContacts.observeAsState(initial = null)
+    val listaChats by viewModel.listaChats.observeAsState(initial = emptyList())
 
     val context = LocalContext.current
 
@@ -67,14 +69,17 @@ fun HomeView(navControl: NavHostController, viewModel: HomeViewModel) {
                         isAdd = { viewModel.changeIsAddContact(!isAddContact) }
                     )
                 }
-
                 1 -> {
                     TopBarChats { viewModel.changeIsSearch(!isBuscar) }
                 }
             }
         },
         bottomBar = { BottonBar(Modifier, seccion, viewModel) },
-        floatingActionButton = { if (seccion == 1) FABStartChat(modifier = Modifier, {}) },
+        floatingActionButton = {
+            if (seccion == 1) FABStartChat(modifier = Modifier) {
+                Log.d("LR LOG", "Nuevo chat....")
+            }
+        },
         floatingActionButtonPosition = FabPosition.End,
     ) {
 
@@ -87,21 +92,23 @@ fun HomeView(navControl: NavHostController, viewModel: HomeViewModel) {
             when (seccion) {
                 0 -> {
                     viewModel.getAllContact()
-                    val filtro = listaContactos?.filter { contact -> contact.nombre.contains(textSearch, ignoreCase = true)} //Filtra todos los contactos por nombre
+                    val filtro = listaContactos?.filter {it.nombre.contains(textSearch, ignoreCase = true)
+                    } //Filtra todos los contactos por nombre
                     if (filtro != null) {
-                        ContactosView(listaContactos = filtro) { user ->
+                        ContactosView(listaContactos = filtro) { contact ->
                             viewModel.onSeccionChange(3)
-                            navControl.navigate(RutasNav.Chat.chatRouteWithId(user.idGoogle))
+                            navControl.navigate(RutasNav.Chat.chatRouteWithId(contact.idGoogle))
                         }
                     }
                 }
-
                 1 -> {
-                    val filtro = listOf<Chats>()
-                    //    listaChats.filter { it.title.contains(textSearch, ignoreCase = true) }
-                    ListaChatsView(listaChats = filtro)
+                    viewModel.getAllChatUser()
+                    val filtro = listaChats.filter { it.title.contains(textSearch, ignoreCase = true) }
+                    ListaChatsView(listaChats = filtro) { idGoogleContact ->
+                        viewModel.onSeccionChange(3)
+                        navControl.navigate(RutasNav.Chat.chatRouteWithId(idGoogleContact))
+                    }
                 }
-
                 2 -> {
                     viewModel.changeIsSearch(false)
                     viewModel.changeIsAddContact(false)

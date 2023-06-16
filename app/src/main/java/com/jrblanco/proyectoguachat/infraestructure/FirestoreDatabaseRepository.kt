@@ -3,10 +3,13 @@ package com.jrblanco.proyectoguachat.infraestructure
 import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.jrblanco.proyectoguachat.domain.model.ChatUsuario
+import com.jrblanco.proyectoguachat.domain.model.Chats
+import com.jrblanco.proyectoguachat.domain.model.Message
 import com.jrblanco.proyectoguachat.domain.model.Usuario
 import com.jrblanco.proyectoguachat.domain.repository.DataBaseRepository
 
@@ -15,6 +18,7 @@ class FirestoreDatabaseRepository : DataBaseRepository {
     private val CONTACTOS = "contactos"
     private val MISCHATS = "mischat"
     private val CHATS = "chats"
+    private val MENSAJES = "mensajes"
 
     private val db = Firebase.firestore
 
@@ -101,16 +105,16 @@ class FirestoreDatabaseRepository : DataBaseRepository {
         }
     }
 
-    override fun loadChatWithContact(idGoogleContact: String, onSuccess: (Usuario) -> Unit) {
+    override fun loadChatWithContact(idGoogleContact: String, onSuccess: (ChatUsuario) -> Unit) {
         val auth = Firebase.auth.currentUser
-        var chat: Usuario? = null
+        var chat: ChatUsuario? = null
 
         if (auth != null) {
             db.collection(Usuario.USUARIOS).document(auth.uid).collection(MISCHATS)
                 .get()
                 .addOnSuccessListener { query ->
                     query.forEach { document ->
-                        val chatContact = document.toObject<Usuario>()
+                        val chatContact = document.toObject<ChatUsuario>()
                         if (chatContact.idGoogle.equals(idGoogleContact)) {
                             chat = chatContact
                         }
@@ -121,7 +125,7 @@ class FirestoreDatabaseRepository : DataBaseRepository {
         }
     }
 
-    override fun newChat(usuario: Usuario, contact: Usuario) {
+    override fun newChat(usuario: Usuario, contact: Usuario, onSuccess: (String) -> Unit) {
 
         val datosNewChat = hashMapOf<String, Any>(
             "date" to Timestamp.now(),
@@ -142,12 +146,17 @@ class FirestoreDatabaseRepository : DataBaseRepository {
                     isGrupo = false,
                     idGoogle = contact.idGoogle,
                     nombre = contact.nombre,
-                    icono = contact.avatar
+                    icono = contact.avatar //??
                 )
                 db.collection(USUARIOS).document(usuario.idGoogle).collection(MISCHATS)
                     .document(idChat)
                     .set(chatContacto)
-                    .addOnSuccessListener { Log.d("JR LOG","Chat creado en contactos del usuario") }
+                    .addOnSuccessListener {
+                        Log.d(
+                            "JR LOG",
+                            "Chat creado en contactos del usuario"
+                        )
+                    }
                 //En el Contacto
                 val chatUsuario = ChatUsuario(
                     idchat = idChat,
@@ -159,9 +168,65 @@ class FirestoreDatabaseRepository : DataBaseRepository {
                 db.collection(USUARIOS).document(contact.idGoogle).collection(MISCHATS)
                     .document(idChat)
                     .set(chatUsuario)
-                    .addOnSuccessListener { Log.d("JR LOG","Chat creado en contactos del contacto") }
+                    .addOnSuccessListener {
+                        Log.d(
+                            "JR LOG",
+                            "Chat creado en contactos del contacto"
+                        )
+                    }
+                onSuccess(idChat)
             }
+            .addOnFailureListener { Log.e("JR LOG", "Error creando CHAT") }
     }
 
+    override fun sendMessageChat(messageToSend: Message, idChat: String) {
 
+        db.collection(CHATS).document(idChat).collection(MENSAJES)
+            .add(messageToSend)
+            .addOnSuccessListener {
+                //Actualiza la info del hilo padre
+                val datosForChat = hashMapOf<String, Any>(
+                    "lastMessage" to messageToSend.mensaje,
+                    "date" to messageToSend.fecha!!,
+                    "subTitle" to messageToSend.nombre,
+                )
+                db.collection(CHATS).document(idChat)
+                    .update(datosForChat)
+            }
+            .addOnFailureListener { Log.e("JR LOG", "Error enviando/guardando mensaje") }
+    }
+
+    override fun loadListChats(usuario: Usuario, onSuccess: (List<Chats>) -> Unit) {
+        val listMisChats = mutableListOf<ChatUsuario>()
+        val listChats = mutableListOf<Chats>()
+
+        db.collection(USUARIOS).document(usuario.idGoogle).collection(MISCHATS)
+            .get()
+            .addOnSuccessListener { docMisChat ->
+                docMisChat.forEach { chat ->
+                    val chat = chat.toObject<ChatUsuario>()
+                    listMisChats.add(chat)
+                }
+
+                db.collection(CHATS)
+                    .get()
+                    .addOnSuccessListener {
+                        for (document in it) {
+                            for (mischat in listMisChats) {
+
+                                if (document.id.equals(mischat.idchat)) {
+                                    val chat = document.toObject<Chats>()
+                                    chat.idChat = document.id
+                                    chat.icon = mischat.icono
+                                    chat.title = mischat.nombre
+                                    chat.idGoogle = mischat.idGoogle
+                                    listChats.add(chat)
+                                }
+                            }
+                        }
+                        onSuccess(listChats)
+                    }
+
+            }
+    }
 }

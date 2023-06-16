@@ -10,5 +10,6 @@ data class Chats(
     var title: String = "",
     var subTitle: String = "",
     var icon: String = "",
+    var idGoogle:String = ""
   //  var countNewMessage: Int = -1,
 )
