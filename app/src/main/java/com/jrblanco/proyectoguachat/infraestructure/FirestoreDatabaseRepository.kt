@@ -3,7 +3,9 @@ package com.jrblanco.proyectoguachat.infraestructure
 import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
@@ -179,6 +181,7 @@ class FirestoreDatabaseRepository : DataBaseRepository {
             .addOnFailureListener { Log.e("JR LOG", "Error creando CHAT") }
     }
 
+
     override fun sendMessageChat(messageToSend: Message, idChat: String) {
 
         db.collection(CHATS).document(idChat).collection(MENSAJES)
@@ -194,6 +197,25 @@ class FirestoreDatabaseRepository : DataBaseRepository {
                     .update(datosForChat)
             }
             .addOnFailureListener { Log.e("JR LOG", "Error enviando/guardando mensaje") }
+    }
+
+    override fun loadMessageChat(idChat: String, onSuccess: (Message) -> Unit) {
+        db.collection(CHATS).document(idChat).collection(MENSAJES)
+            .orderBy("fecha", Query.Direction.ASCENDING)
+            .addSnapshotListener{ snapShot, ex ->
+                if (ex != null) {
+                    Log.e("JR LOG", "Error en el listener del loadMessageChat")
+                    return@addSnapshotListener
+                }
+                if (snapShot != null && !snapShot.isEmpty){
+                    snapShot.documentChanges.forEach{dc ->
+                        if (dc.type == DocumentChange.Type.ADDED) {
+                            val mensaje = dc.document.toObject<Message>()
+                            onSuccess(mensaje)
+                        }
+                    }
+                }
+            }
     }
 
     override fun loadListChats(usuario: Usuario, onSuccess: (List<Chats>) -> Unit) {

@@ -1,13 +1,21 @@
 package com.jrblanco.proyectoguachat.aplication.viewmodels
 
-import android.icu.util.MeasureUnit
 import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.jrblanco.proyectoguachat.aplication.usecase.LoadChatWithContactUseCase
 import com.jrblanco.proyectoguachat.aplication.usecase.LoadContactUseCase
+import com.jrblanco.proyectoguachat.aplication.usecase.LoadMessageChatUseCase
 import com.jrblanco.proyectoguachat.aplication.usecase.LoadUserDBUseCase
 import com.jrblanco.proyectoguachat.aplication.usecase.NewChatUseCase
 import com.jrblanco.proyectoguachat.aplication.usecase.SendMessageChatUseCase
@@ -25,6 +33,9 @@ class ChatViewModel : ViewModel() {
     private val loadUserDBUseCase = LoadUserDBUseCase(dataBaseRepository)
     private val newChatUseCase = NewChatUseCase(dataBaseRepository)
     private val sendMessageChatUseCase = SendMessageChatUseCase(dataBaseRepository)
+    private val loadMessageChatUseCase = LoadMessageChatUseCase(dataBaseRepository)
+
+    val auth = Firebase.auth.currentUser
 
     private val _usuario = MutableLiveData<Usuario>()
     val usuario: LiveData<Usuario> = _usuario
@@ -40,11 +51,14 @@ class ChatViewModel : ViewModel() {
 
     private var idChat = ""
 
+    private val _listMessagesChat = MutableLiveData<List<Message>>()
+    val listMessagesChat: LiveData<List<Message>> = _listMessagesChat
+
     fun onChangeMessageText(valor: String) {
         _messageText.value = valor
     }
 
-    fun setContact(idContact: String) {
+    fun initChatData(idContact: String) {
         loadContactUseCase(idContact) {
             _contact.value = it
             recoverMessages(idContact)
@@ -55,34 +69,47 @@ class ChatViewModel : ViewModel() {
     }
 
     fun recoverMessages(idContact: String) {
+
         _noHasMessages.value = true
 
         loadChatWithContactUseCase(idContact) {
             _noHasMessages.value = false
             this.idChat = it.idchat
+            loadMessageChatUseCase(this.idChat) {mnj ->
+                addMensaje(mnj)
+            }
         }
     }
 
-    fun sendMessage() {
-        if (_messageText.value?.isNotBlank()!! && _messageText.value?.isNotEmpty()!!) {
-            val mensajeToSend = Message(
-                idGoogle = _usuario.value?.idGoogle.toString(),
-                mensaje = _messageText.value.toString(),
-                nombre = _usuario.value?.nombre.toString(),
-                imagen = "",
-                fecha = Timestamp.now()
-            )
 
-            if (_noHasMessages.value == true) {
-                newChatUseCase(usuario.value!!, contact.value!!) {
-                    this.idChat = it
+    private fun addMensaje(message: Message){
+        val listMensajes = _listMessagesChat.value?.toMutableList() ?: mutableListOf()
+        listMensajes.add(message)
+        _listMessagesChat.value = listMensajes
+    }
+
+    fun sendMessage() {
+        if (_messageText.value != null) {
+            if (_messageText.value?.isNotBlank() == true && _messageText.value?.isNotEmpty()!!) {
+                val mensajeToSend = Message(
+                    idGoogle = _usuario.value?.idGoogle.toString(),
+                    mensaje = _messageText.value.toString(),
+                    nombre = _usuario.value?.nombre.toString(),
+                    imagen = "",
+                    fecha = Timestamp.now()
+                )
+
+                if (_noHasMessages.value == true) {
+                    newChatUseCase(usuario.value!!, contact.value!!) {
+                        this.idChat = it
+                        sendMessageChatUseCase(mensajeToSend, this.idChat)
+                    }
+                    _noHasMessages.value = false
+                } else {
                     sendMessageChatUseCase(mensajeToSend, this.idChat)
                 }
-                _noHasMessages.value = false
-            } else {
-                sendMessageChatUseCase(mensajeToSend, this.idChat)
+                onChangeMessageText("") //Limpia el mensaje
             }
-            onChangeMessageText("") //Limpia el mensaje
         }
     }
 

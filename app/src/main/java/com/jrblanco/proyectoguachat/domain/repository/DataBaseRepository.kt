@@ -18,6 +18,7 @@ interface DataBaseRepository {
     fun loadChatWithContact(idGoogleContact: String, onSuccess: (ChatUsuario) -> Unit)
     fun newChat(usuario: Usuario, contact: Usuario, onSuccess: (String) -> Unit)
     fun sendMessageChat(messageToSend: Message, idChat: String)
+    fun loadMessageChat(idChat: String, onSuccess: (Message) -> Unit)
     //--- Métodos del Listado de Chats de cada usuario
     fun loadListChats(usuario: Usuario, onSuccess: (List<Chats>) -> Unit)
 }

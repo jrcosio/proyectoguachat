@@ -42,6 +42,9 @@ class HomeViewModel : ViewModel() {
     private val _isSearch = MutableLiveData<Boolean>()
     val isSearch: LiveData<Boolean> = _isSearch
 
+    private val _isNewChat = MutableLiveData<Boolean>()
+    val isNewChat: LiveData<Boolean> = _isNewChat
+
     private val _isAddContact = MutableLiveData<Boolean>()
     val isAddContact: LiveData<Boolean> = _isAddContact
 
@@ -84,6 +87,10 @@ class HomeViewModel : ViewModel() {
     fun changeIsAddContact(valor: Boolean) {
         _isAddContact.value = valor
         if (valor) _isSearch.value = false
+    }
+
+    fun changeIsNewChat(valor: Boolean) {
+        _isNewChat.value = valor
     }
 
     fun resetAll() {

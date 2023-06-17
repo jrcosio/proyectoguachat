@@ -1,5 +1,7 @@
 package com.jrblanco.proyectoguachat.ui.screens
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,8 +16,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.AttachFile
@@ -35,6 +42,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,14 +56,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.google.firebase.auth.FirebaseUser
 import com.jrblanco.proyectoguachat.R
 import com.jrblanco.proyectoguachat.aplication.viewmodels.ChatViewModel
+import com.jrblanco.proyectoguachat.domain.model.Message
 import com.jrblanco.proyectoguachat.domain.model.Usuario
 import com.jrblanco.proyectoguachat.ui.theme.Azul30
 import com.jrblanco.proyectoguachat.ui.theme.Azul40
+import com.jrblanco.proyectoguachat.ui.theme.Azul40Transp
+import com.jrblanco.proyectoguachat.ui.theme.Azul40Transp2
+import com.jrblanco.proyectoguachat.ui.theme.Green40Transp
 import com.jrblanco.proyectoguachat.ui.theme.Green30
+import com.jrblanco.proyectoguachat.ui.theme.Green40Transp2
 import com.jrblanco.proyectoguachat.ui.theme.PurpleGrey80
 import com.jrblanco.proyectoguachat.ui.theme.Red50
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,8 +81,10 @@ fun ChatView(navControl: NavHostController, viewModel: ChatViewModel, idGoogle: 
     val contact by viewModel.contact.observeAsState(initial = Usuario("", "", "", ""))
     val noHasMessage by viewModel.noHasMessages.observeAsState(initial = false)
     val messageText by viewModel.messageText.observeAsState(initial = "")
+    val listaMensajeChat by viewModel.listMessagesChat.observeAsState(initial = emptyList())
 
-    viewModel.setContact(idGoogle) //Obtiene info del contacto
+
+    viewModel.initChatData(idGoogle) //Obtiene info del contacto
 
     Scaffold(
         topBar = {
@@ -90,7 +109,120 @@ fun ChatView(navControl: NavHostController, viewModel: ChatViewModel, idGoogle: 
                 .fillMaxSize()
                 .padding(it)
         ) {
+            LazyColumnMensajesChat(listaMensajeChat, viewModel)
+        }
+    }
+}
 
+@SuppressLint("CoroutineCreationDuringComposition")
+@Composable
+private fun LazyColumnMensajesChat(
+    listaMensajeChat: List<Message>,
+    viewModel: ChatViewModel
+) {
+    val lazyColumnListState = rememberLazyListState()
+    val corroutineScope = rememberCoroutineScope()
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 10.dp),
+        state = lazyColumnListState
+    ) {
+        items(listaMensajeChat) {item ->
+            ItemMensaje(item, viewModel.auth)
+        }
+    }
+    corroutineScope.launch {
+        //    if (index == 8)
+        lazyColumnListState.scrollToItem(listaMensajeChat.size)
+    }
+}
+
+@Composable
+fun ItemMensaje(mensaje: Message, auth: FirebaseUser?) {
+
+    if (mensaje.idGoogle.equals(auth?.uid)) {
+        MensajeDerecha(mensaje)
+    } else {
+        MensajeIzquierda(mensaje)
+    }
+}
+
+@Composable
+private fun MensajeDerecha(mensaje: Message) {
+
+    val formatFecha = SimpleDateFormat("hh:mm", Locale("es", "ES"))
+    val fecha = mensaje.fecha?.toDate()?.let { formatFecha.format(it) }.orEmpty()
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.End
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(start = 80.dp, top = 2.dp, bottom = 1.dp)
+                .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomStart = 20.dp))
+                .background(Azul40Transp)
+
+        ) {
+            Column(
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(text = mensaje.mensaje)
+                Row(
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(Azul40Transp2)
+                            .padding(2.dp)
+                    ) {
+                        Text(text = fecha, fontSize = 11.sp)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MensajeIzquierda(mensaje: Message) {
+
+    val formatFecha = SimpleDateFormat("hh:mm", Locale("es", "ES"))
+    val fecha = mensaje.fecha?.toDate()?.let { formatFecha.format(it) }.orEmpty()
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.Start
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(end = 80.dp, top = 2.dp, bottom = 1.dp)
+                .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomEnd = 20.dp))
+                .background(Green40Transp)
+
+        ) {
+            Column(
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(text = mensaje.mensaje)
+                Row(
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(Green40Transp2)
+                            .padding(2.dp)
+                    ) {
+                        Text(text = fecha, fontSize = 11.sp)
+                    }
+                }
+            }
         }
     }
 }
@@ -176,7 +308,10 @@ fun BottomBarChat(messageText: String, viewModel: ChatViewModel) {
                 shape = CircleShape,
                 maxLines = 1,
                 singleLine = true,
-                placeholder = { Text(text = "Mensaje") }
+                placeholder = { Text(text = "Mensaje")},
+                keyboardActions = KeyboardActions(onDone = {
+                    viewModel.sendMessage()
+                })
             )
             IconButton(
                 onClick = { viewModel.sendMessage() },
@@ -187,13 +322,11 @@ fun BottomBarChat(messageText: String, viewModel: ChatViewModel) {
                 Icon(
                     imageVector = Icons.Filled.Send,
                     contentDescription = "Enviar Mensaje",
-
                     tint = Azul30
                 )
             }
         }
     }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

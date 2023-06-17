@@ -1,7 +1,5 @@
 package com.jrblanco.proyectoguachat.ui.screen.principal
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -31,11 +29,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.jrblanco.proyectoguachat.aplication.viewmodels.HomeViewModel
-import com.jrblanco.proyectoguachat.domain.model.Chats
-import com.jrblanco.proyectoguachat.domain.model.Usuario
 import com.jrblanco.proyectoguachat.modelo.RutasNav
 import com.jrblanco.proyectoguachat.ui.components.AddContacto
 import com.jrblanco.proyectoguachat.ui.components.FABStartChat
+import com.jrblanco.proyectoguachat.ui.components.NewChat
 import com.jrblanco.proyectoguachat.ui.principal.TopBarChats
 import com.jrblanco.proyectoguachat.ui.principal.TopBarContact
 import com.jrblanco.proyectoguachat.ui.screen.principal.componenteshome.BottonBar
@@ -57,6 +54,7 @@ fun HomeView(navControl: NavHostController, viewModel: HomeViewModel) {
     val isAddContact by viewModel.isAddContact.observeAsState(initial = false)
     val listaContactos by viewModel.allContacts.observeAsState(initial = null)
     val listaChats by viewModel.listaChats.observeAsState(initial = emptyList())
+    val isNewChat by viewModel.isNewChat.observeAsState(initial = false)
 
     val context = LocalContext.current
 
@@ -77,7 +75,7 @@ fun HomeView(navControl: NavHostController, viewModel: HomeViewModel) {
         bottomBar = { BottonBar(Modifier, seccion, viewModel) },
         floatingActionButton = {
             if (seccion == 1) FABStartChat(modifier = Modifier) {
-                Log.d("LR LOG", "Nuevo chat....")
+                viewModel.changeIsNewChat(!isNewChat)
             }
         },
         floatingActionButtonPosition = FabPosition.End,
@@ -133,6 +131,10 @@ fun HomeView(navControl: NavHostController, viewModel: HomeViewModel) {
             viewModel.newContacto(user) {
                 viewModel.getAllContact()
             }
+        }
+        NewChat(isVisible = isNewChat, listaContactos,viewModel) {user ->
+            viewModel.onSeccionChange(3)
+            navControl.navigate(RutasNav.Chat.chatRouteWithId(user.idGoogle))
         }
     }
 }
