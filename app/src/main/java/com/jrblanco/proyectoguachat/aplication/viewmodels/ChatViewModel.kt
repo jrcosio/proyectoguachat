@@ -103,6 +103,9 @@ class ChatViewModel : ViewModel() {
                     newChatUseCase(usuario.value!!, contact.value!!) {
                         this.idChat = it
                         sendMessageChatUseCase(mensajeToSend, this.idChat)
+                        loadMessageChatUseCase(this.idChat) {mnj ->
+                            addMensaje(mnj)
+                        }
                     }
                     _noHasMessages.value = false
                 } else {

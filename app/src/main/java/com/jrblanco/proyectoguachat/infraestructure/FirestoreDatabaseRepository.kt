@@ -223,32 +223,67 @@ class FirestoreDatabaseRepository : DataBaseRepository {
         val listChats = mutableListOf<Chats>()
 
         db.collection(USUARIOS).document(usuario.idGoogle).collection(MISCHATS)
-            .get()
-            .addOnSuccessListener { docMisChat ->
-                docMisChat.forEach { chat ->
-                    val chat = chat.toObject<ChatUsuario>()
-                    listMisChats.add(chat)
+            .addSnapshotListener{ snapShot, ex ->
+                if (ex != null) {
+                    Log.e("JR LOG", "Error en el listener del loadMessageChat")
+                    return@addSnapshotListener
                 }
-
-                db.collection(CHATS)
-                    .get()
-                    .addOnSuccessListener {
-                        for (document in it) {
-                            for (mischat in listMisChats) {
-
-                                if (document.id.equals(mischat.idchat)) {
-                                    val chat = document.toObject<Chats>()
-                                    chat.idChat = document.id
-                                    chat.icon = mischat.icono
-                                    chat.title = mischat.nombre
-                                    chat.idGoogle = mischat.idGoogle
-                                    listChats.add(chat)
+                if (snapShot != null && !snapShot.isEmpty){
+                    snapShot.documentChanges.forEach { dc ->
+                        val chat = dc.document.toObject<ChatUsuario>()
+                        listMisChats.add(chat)
+                    }
+                    db.collection(CHATS)
+                        .addSnapshotListener{ snapShot, ex ->
+                            if (ex != null) {
+                                Log.e("JR LOG", "Error en el listener del loadMessageChat")
+                                return@addSnapshotListener
+                            }
+                            if (snapShot != null && !snapShot.isEmpty){
+                                for (document in snapShot.documentChanges) {
+                                    for (mischat in listMisChats) {
+                                        if (document.document.id.equals(mischat.idchat)) {
+                                            val chat = document.document.toObject<Chats>()
+                                            chat.idChat = document.document.id
+                                            chat.icon = mischat.icono
+                                            chat.title = mischat.nombre
+                                            chat.idGoogle = mischat.idGoogle
+                                            listChats.add(chat)
+                                        }
+                                    }
                                 }
+                                onSuccess(listChats)
                             }
                         }
-                        onSuccess(listChats)
-                    }
-
+                }
             }
+//        db.collection(USUARIOS).document(usuario.idGoogle).collection(MISCHATS)
+//            .get()
+//            .addOnSuccessListener { docMisChat ->
+//                docMisChat.forEach { chat ->
+//                    val chat = chat.toObject<ChatUsuario>()
+//                    listMisChats.add(chat)
+//                }
+//
+//                db.collection(CHATS)
+//                    .get()
+//                    .addOnSuccessListener {
+//                        for (document in it) {
+//                            for (mischat in listMisChats) {
+//
+//                                if (document.id.equals(mischat.idchat)) {
+//                                    val chat = document.toObject<Chats>()
+//                                    chat.idChat = document.id
+//                                    chat.icon = mischat.icono
+//                                    chat.title = mischat.nombre
+//                                    chat.idGoogle = mischat.idGoogle
+//                                    listChats.add(chat)
+//                                }
+//                            }
+//                        }
+//                        onSuccess(listChats)
+//                    }
+//
+//            }
     }
 }

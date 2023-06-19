@@ -92,6 +92,7 @@ fun ChatView(navControl: NavHostController, viewModel: ChatViewModel, idGoogle: 
     val listaMensajeChat by viewModel.listMessagesChat.observeAsState(initial = emptyList())
 
 
+
     viewModel.initChatData(idGoogle) //Obtiene info del contacto
 
     Scaffold(
@@ -111,15 +112,20 @@ fun ChatView(navControl: NavHostController, viewModel: ChatViewModel, idGoogle: 
             alpha = 0.4f,
             colorFilter = ColorFilter.tint(Azul30)
         )
-        showNoMensajes(noHasMessage, contact)
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it)
-        ) {
-            LazyColumnMensajesChat(listaMensajeChat, viewModel)
+        if (listaMensajeChat.isEmpty()) {
+            showNoMensajes(true, contact)
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it)
+            ) {
+                LazyColumnMensajesChat(listaMensajeChat, viewModel)
+            }
         }
     }
+
+
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -142,6 +148,8 @@ private fun LazyColumnMensajesChat(
                 interactionSource = interactionSource,
                 indication = null, //desactiva el ripple effect
                 onClick = { keyboardController?.hide() }),
+
+        verticalArrangement = Arrangement.Bottom,
         state = lazyColumnListState
     ) {
         items(listaMensajeChat) { item ->

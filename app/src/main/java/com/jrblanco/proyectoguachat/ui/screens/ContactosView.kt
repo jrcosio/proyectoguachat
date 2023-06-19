@@ -40,7 +40,6 @@ import com.jrblanco.proyectoguachat.ui.theme.PurpleGrey80
 
 @Composable
 fun ContactosView(listaContactos: List<Usuario>, onclick: (Usuario) -> Unit) {
-    Log.d("JR LOG", "Mostrando contactos del usuario --> ${listaContactos.size} en total.")
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier.fillMaxSize()
