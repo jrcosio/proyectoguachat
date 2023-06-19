@@ -217,8 +217,40 @@ class FirestoreDatabaseRepository : DataBaseRepository {
                 }
             }
     }
-
     override fun loadListChats(usuario: Usuario, onSuccess: (List<Chats>) -> Unit) {
+        db.collection(USUARIOS).document(usuario.idGoogle).collection(MISCHATS)
+            .addSnapshotListener { snapShot, ex ->
+                if (ex != null) {
+                    Log.e("JR LOG", "Error en el listener del loadMessageChat")
+                    return@addSnapshotListener
+                }
+                if (snapShot != null && !snapShot.isEmpty) {
+                    val listMisChats = snapShot.documentChanges.map { dc -> dc.document.toObject<ChatUsuario>() }
+                    db.collection(CHATS)
+                        .whereIn(FieldPath.documentId(), listMisChats.map { it.idchat })
+                        .addSnapshotListener { snapShot, ex ->
+                            if (ex != null) {
+                                Log.e("JR LOG", "Error en el listener del loadMessageChat")
+                                return@addSnapshotListener
+                            }
+                            if (snapShot != null && !snapShot.isEmpty) {
+                                val listChats = snapShot.documents.map { document ->
+                                    val mischat = listMisChats.first { it.idchat == document.id }
+                                    val chat = document.toObject<Chats>()?.apply {
+                                        idChat = document.id
+                                        icon = mischat.icono
+                                        title = mischat.nombre
+                                        idGoogle = mischat.idGoogle
+                                    }
+                                    chat
+                                }
+                                onSuccess(listChats as List<Chats>)
+                            }
+                        }
+                }
+            }
+    }
+  /*  override fun loadListChats(usuario: Usuario, onSuccess: (List<Chats>) -> Unit) {
         val listMisChats = mutableListOf<ChatUsuario>()
         val listChats = mutableListOf<Chats>()
 
@@ -286,4 +318,6 @@ class FirestoreDatabaseRepository : DataBaseRepository {
 //
 //            }
     }
+
+   */
 }
