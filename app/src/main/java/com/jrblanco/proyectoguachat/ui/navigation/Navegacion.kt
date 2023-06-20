@@ -34,7 +34,7 @@ fun Navegacion(navControl: NavHostController) {
 //
 //    val googleSingInCliente = GoogleSignIn.getClient(LocalContext.current, opciones)
 //
-//    
+//
 //    googleSingInCliente.signOut()
 //    FirebaseAuth.getInstance().signOut()
 
