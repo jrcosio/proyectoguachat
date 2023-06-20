@@ -27,16 +27,16 @@ import com.jrblanco.proyectoguachat.ui.screens.SplashView
 @Composable
 fun Navegacion(navControl: NavHostController) {
 
-    val opciones = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-        .requestIdToken(stringResource(id = R.string.default_web_client_id))
-        .requestEmail()
-        .build()
-
-    val googleSingInCliente = GoogleSignIn.getClient(LocalContext.current, opciones)
-
-    //Esto se quita cuando este todo operativo
-    googleSingInCliente.signOut()
-    FirebaseAuth.getInstance().signOut()
+//    val opciones = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//        .requestIdToken(stringResource(id = R.string.default_web_client_id))
+//        .requestEmail()
+//        .build()
+//
+//    val googleSingInCliente = GoogleSignIn.getClient(LocalContext.current, opciones)
+//
+//    
+//    googleSingInCliente.signOut()
+//    FirebaseAuth.getInstance().signOut()
 
     NavHost(navController = navControl, startDestination = RutasNav.Splash.route) {
         composable(RutasNav.Splash.route) {

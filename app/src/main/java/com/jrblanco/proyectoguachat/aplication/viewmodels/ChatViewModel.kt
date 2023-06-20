@@ -69,9 +69,7 @@ class ChatViewModel : ViewModel() {
     }
 
     fun recoverMessages(idContact: String) {
-
         _noHasMessages.value = true
-
         loadChatWithContactUseCase(idContact) {
             _noHasMessages.value = false
             this.idChat = it.idchat
@@ -80,8 +78,6 @@ class ChatViewModel : ViewModel() {
             }
         }
     }
-
-
     private fun addMensaje(message: Message){
         val listMensajes = _listMessagesChat.value?.toMutableList() ?: mutableListOf()
         listMensajes.add(message)

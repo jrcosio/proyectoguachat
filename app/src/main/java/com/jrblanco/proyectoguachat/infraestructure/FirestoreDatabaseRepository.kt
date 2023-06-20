@@ -199,16 +199,17 @@ class FirestoreDatabaseRepository : DataBaseRepository {
             .addOnFailureListener { Log.e("JR LOG", "Error enviando/guardando mensaje") }
     }
 
+
     override fun loadMessageChat(idChat: String, onSuccess: (Message) -> Unit) {
         db.collection(CHATS).document(idChat).collection(MENSAJES)
             .orderBy("fecha", Query.Direction.ASCENDING)
-            .addSnapshotListener{ snapShot, ex ->
+            .addSnapshotListener { snapShot, ex ->
                 if (ex != null) {
                     Log.e("JR LOG", "Error en el listener del loadMessageChat")
                     return@addSnapshotListener
                 }
-                if (snapShot != null && !snapShot.isEmpty){
-                    snapShot.documentChanges.forEach{dc ->
+                if (snapShot != null && !snapShot.isEmpty) {
+                    snapShot.documentChanges.forEach { dc ->
                         if (dc.type == DocumentChange.Type.ADDED) {
                             val mensaje = dc.document.toObject<Message>()
                             onSuccess(mensaje)
@@ -217,21 +218,26 @@ class FirestoreDatabaseRepository : DataBaseRepository {
                 }
             }
     }
+
+
     override fun loadListChats(usuario: Usuario, onSuccess: (List<Chats>) -> Unit) {
         db.collection(USUARIOS).document(usuario.idGoogle).collection(MISCHATS)
             .addSnapshotListener { snapShot, ex ->
                 if (ex != null) {
-                    Log.e("JR LOG", "Error en el listener del loadMessageChat")
+                    Log.e("JR LOG", "Error en el listener del loadMessageChat 1")
                     return@addSnapshotListener
                 }
                 if (snapShot != null && !snapShot.isEmpty) {
-                    val listMisChats = snapShot.documentChanges.map { dc -> dc.document.toObject<ChatUsuario>() }
+                    val listMisChats = snapShot.documentChanges.map { dc ->
+                        dc.document.toObject<ChatUsuario>()
+                    }
                     db.collection(CHATS)
                         .whereIn(FieldPath.documentId(), listMisChats.map { it.idchat })
                         .addSnapshotListener { snapShot, ex ->
                             if (ex != null) {
-                                Log.e("JR LOG", "Error en el listener del loadMessageChat")
-                                return@addSnapshotListener
+                                Log.e("JR LOG", "Error en el listener del loadMessageChat 2")
+                                Log.e("JR LOG", ex.message.toString())
+                                    return@addSnapshotListener
                             }
                             if (snapShot != null && !snapShot.isEmpty) {
                                 val listChats = snapShot.documents.map { document ->
@@ -244,80 +250,82 @@ class FirestoreDatabaseRepository : DataBaseRepository {
                                     }
                                     chat
                                 }
-                                onSuccess(listChats as List<Chats>)
+                                onSuccess(listChats.sortedByDescending { it?.date } as List<Chats>)
                             }
                         }
                 }
             }
     }
-  /*  override fun loadListChats(usuario: Usuario, onSuccess: (List<Chats>) -> Unit) {
-        val listMisChats = mutableListOf<ChatUsuario>()
-        val listChats = mutableListOf<Chats>()
 
-        db.collection(USUARIOS).document(usuario.idGoogle).collection(MISCHATS)
-            .addSnapshotListener{ snapShot, ex ->
-                if (ex != null) {
-                    Log.e("JR LOG", "Error en el listener del loadMessageChat")
-                    return@addSnapshotListener
-                }
-                if (snapShot != null && !snapShot.isEmpty){
-                    snapShot.documentChanges.forEach { dc ->
-                        val chat = dc.document.toObject<ChatUsuario>()
-                        listMisChats.add(chat)
-                    }
-                    db.collection(CHATS)
-                        .addSnapshotListener{ snapShot, ex ->
-                            if (ex != null) {
-                                Log.e("JR LOG", "Error en el listener del loadMessageChat")
-                                return@addSnapshotListener
-                            }
-                            if (snapShot != null && !snapShot.isEmpty){
-                                for (document in snapShot.documentChanges) {
-                                    for (mischat in listMisChats) {
-                                        if (document.document.id.equals(mischat.idchat)) {
-                                            val chat = document.document.toObject<Chats>()
-                                            chat.idChat = document.document.id
-                                            chat.icon = mischat.icono
-                                            chat.title = mischat.nombre
-                                            chat.idGoogle = mischat.idGoogle
-                                            listChats.add(chat)
-                                        }
-                                    }
-                                }
-                                onSuccess(listChats)
-                            }
-                        }
-                }
-            }
-//        db.collection(USUARIOS).document(usuario.idGoogle).collection(MISCHATS)
-//            .get()
-//            .addOnSuccessListener { docMisChat ->
-//                docMisChat.forEach { chat ->
-//                    val chat = chat.toObject<ChatUsuario>()
-//                    listMisChats.add(chat)
-//                }
-//
-//                db.collection(CHATS)
-//                    .get()
-//                    .addOnSuccessListener {
-//                        for (document in it) {
-//                            for (mischat in listMisChats) {
-//
-//                                if (document.id.equals(mischat.idchat)) {
-//                                    val chat = document.toObject<Chats>()
-//                                    chat.idChat = document.id
-//                                    chat.icon = mischat.icono
-//                                    chat.title = mischat.nombre
-//                                    chat.idGoogle = mischat.idGoogle
-//                                    listChats.add(chat)
-//                                }
-//                            }
-//                        }
-//                        onSuccess(listChats)
-//                    }
-//
-//            }
-    }
 
-   */
+    /*  override fun loadListChats(usuario: Usuario, onSuccess: (List<Chats>) -> Unit) {
+          val listMisChats = mutableListOf<ChatUsuario>()
+          val listChats = mutableListOf<Chats>()
+
+          db.collection(USUARIOS).document(usuario.idGoogle).collection(MISCHATS)
+              .addSnapshotListener{ snapShot, ex ->
+                  if (ex != null) {
+                      Log.e("JR LOG", "Error en el listener del loadMessageChat")
+                      return@addSnapshotListener
+                  }
+                  if (snapShot != null && !snapShot.isEmpty){
+                      snapShot.documentChanges.forEach { dc ->
+                          val chat = dc.document.toObject<ChatUsuario>()
+                          listMisChats.add(chat)
+                      }
+                      db.collection(CHATS)
+                          .addSnapshotListener{ snapShot, ex ->
+                              if (ex != null) {
+                                  Log.e("JR LOG", "Error en el listener del loadMessageChat")
+                                  return@addSnapshotListener
+                              }
+                              if (snapShot != null && !snapShot.isEmpty){
+                                  for (document in snapShot.documentChanges) {
+                                      for (mischat in listMisChats) {
+                                          if (document.document.id.equals(mischat.idchat)) {
+                                              val chat = document.document.toObject<Chats>()
+                                              chat.idChat = document.document.id
+                                              chat.icon = mischat.icono
+                                              chat.title = mischat.nombre
+                                              chat.idGoogle = mischat.idGoogle
+                                              listChats.add(chat)
+                                          }
+                                      }
+                                  }
+                                  onSuccess(listChats)
+                              }
+                          }
+                  }
+              }
+  //        db.collection(USUARIOS).document(usuario.idGoogle).collection(MISCHATS)
+  //            .get()
+  //            .addOnSuccessListener { docMisChat ->
+  //                docMisChat.forEach { chat ->
+  //                    val chat = chat.toObject<ChatUsuario>()
+  //                    listMisChats.add(chat)
+  //                }
+  //
+  //                db.collection(CHATS)
+  //                    .get()
+  //                    .addOnSuccessListener {
+  //                        for (document in it) {
+  //                            for (mischat in listMisChats) {
+  //
+  //                                if (document.id.equals(mischat.idchat)) {
+  //                                    val chat = document.toObject<Chats>()
+  //                                    chat.idChat = document.id
+  //                                    chat.icon = mischat.icono
+  //                                    chat.title = mischat.nombre
+  //                                    chat.idGoogle = mischat.idGoogle
+  //                                    listChats.add(chat)
+  //                                }
+  //                            }
+  //                        }
+  //                        onSuccess(listChats)
+  //                    }
+  //
+  //            }
+      }
+
+     */
 }

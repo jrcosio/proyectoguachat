@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -19,6 +20,7 @@ import com.jrblanco.proyectoguachat.domain.model.Chats
 import com.jrblanco.proyectoguachat.domain.model.Usuario
 import com.jrblanco.proyectoguachat.infraestructure.FirebaseStorageRepository
 import com.jrblanco.proyectoguachat.infraestructure.FirestoreDatabaseRepository
+import kotlinx.coroutines.launch
 
 class HomeViewModel : ViewModel() {
     private val dataBaseRepository = FirestoreDatabaseRepository()
@@ -143,9 +145,12 @@ class HomeViewModel : ViewModel() {
 
     fun getAllChatUser() {
         _usuario.value?.let {
-            loadListChatUserUseCase(it) { list ->
-                _listaChats.value = list
+            viewModelScope.launch {
+                loadListChatUserUseCase(it) { list ->
+                    _listaChats.value = list
+                }
             }
+
         }
     }
 
