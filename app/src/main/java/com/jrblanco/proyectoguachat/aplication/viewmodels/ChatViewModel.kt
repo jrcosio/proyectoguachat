@@ -73,7 +73,9 @@ class ChatViewModel : ViewModel() {
         loadChatWithContactUseCase(idContact) {
             _noHasMessages.value = false
             this.idChat = it.idchat
+            //si no tengo par de clave generado Genera y envia
             loadMessageChatUseCase(this.idChat) {mnj ->
+                //desencripta con clave publica dell contact
                 addMensaje(mnj)
             }
         }
@@ -96,10 +98,13 @@ class ChatViewModel : ViewModel() {
                 )
 
                 if (_noHasMessages.value == true) {
+                    //Genera par de clave
                     newChatUseCase(usuario.value!!, contact.value!!) {
                         this.idChat = it
+                        //Encripta mensajes con mi clave privada
                         sendMessageChatUseCase(mensajeToSend, this.idChat)
                         loadMessageChatUseCase(this.idChat) {mnj ->
+                            //desencripta con clave publica del Contact
                             addMensaje(mnj)
                         }
                     }

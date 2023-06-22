@@ -27,6 +27,7 @@ import com.jrblanco.proyectoguachat.ui.screens.SplashView
 @Composable
 fun Navegacion(navControl: NavHostController) {
 
+//    =================== Bloque reset el usuario ==================
 //    val opciones = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
 //        .requestIdToken(stringResource(id = R.string.default_web_client_id))
 //        .requestEmail()
@@ -38,12 +39,14 @@ fun Navegacion(navControl: NavHostController) {
 //    googleSingInCliente.signOut()
 //    FirebaseAuth.getInstance().signOut()
 
+    val usuario = FirebaseAuth.getInstance().currentUser
+
     NavHost(navController = navControl, startDestination = RutasNav.Splash.route) {
         composable(RutasNav.Splash.route) {
             SplashView {
                 //Comprobamos si el dispositivo tiene iniciada la sesión de ser así
                 //cambiamos la ruta de inicio y se salta el Login
-                val usuario = FirebaseAuth.getInstance().currentUser
+
                 if (usuario != null) {
                     navControl.navigate(RutasNav.Home.route, builder = {
                         popUpTo(RutasNav.Splash.route) {

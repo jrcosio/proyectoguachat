@@ -242,14 +242,17 @@ class FirestoreDatabaseRepository : DataBaseRepository {
                             if (snapShot != null && !snapShot.isEmpty) {
                                 val listChats = snapShot.documents.map { document ->
                                     val mischat = listMisChats.first { it.idchat == document.id }
+
                                     val chat = document.toObject<Chats>()?.apply {
                                         idChat = document.id
                                         icon = mischat.icono
                                         title = mischat.nombre
                                         idGoogle = mischat.idGoogle
+
                                     }
                                     chat
                                 }
+
                                 onSuccess(listChats.sortedByDescending { it?.date } as List<Chats>)
                             }
                         }
